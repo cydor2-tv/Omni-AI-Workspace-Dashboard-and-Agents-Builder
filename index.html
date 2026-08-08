@@ -67,47 +67,28 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* --- MODERN ÉS BIZTONSÁGOS TOOLTIP RENDSZER --- */
+        /* --- JAVÍTOTT, GLOBÁLIS TOOLTIP (JS-alapú lesz) --- */
         [data-tooltip] {
-            position: relative;
             cursor: help;
         }
 
-            [data-tooltip]:hover::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                bottom: 125%;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: var(--text-main);
-                color: var(--bg-main);
-                padding: 8px 12px;
-                font-size: 13px;
-                font-weight: 500;
-                line-height: 1.4;
-                border-radius: 6px;
-                white-space: normal;
-                width: max-content;
-                max-width: 250px;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-                z-index: 99999;
-                pointer-events: none;
-                border: 1px solid var(--border);
-                text-align: center;
-            }
-
-            [data-tooltip]:hover::before {
-                content: '';
-                position: absolute;
-                bottom: 115%;
-                left: 50%;
-                transform: translateX(-50%);
-                border-width: 5px;
-                border-style: solid;
-                border-color: var(--text-main) transparent transparent transparent;
-                z-index: 99999;
-                pointer-events: none;
-            }
+        #global-tooltip {
+            position: fixed;
+            background-color: var(--text-main);
+            color: var(--bg-main);
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.4;
+            border-radius: 6px;
+            max-width: 280px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 999999; /* Mindig a legfelül */
+            pointer-events: none;
+            display: none;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
 
         /* --- Fő Navigációs Fülek --- */
         .header-container {
@@ -475,11 +456,11 @@
 
         /* Agent sablon lista stílusok */
         .templates-wrapper {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 10px;
             overflow-y: auto;
-            max-height: 40vh;
+            max-height: 60vh;
             padding-right: 5px;
         }
 
@@ -497,8 +478,9 @@
             border: 1px dashed var(--border);
             border-radius: 6px;
             padding: 12px;
-            cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
         }
 
             .template-card:hover {
@@ -516,7 +498,22 @@
         .template-sub {
             font-size: 12px;
             color: var(--text-dim);
+            margin-bottom: 10px;
+            flex-grow: 1;
         }
+
+        .lego-btn-group {
+            display: flex;
+            gap: 5px;
+            margin-top: auto;
+        }
+
+            .lego-btn-group button {
+                flex: 1;
+                padding: 6px;
+                font-size: 11px;
+                text-transform: uppercase;
+            }
 
         #toast {
             position: fixed;
@@ -536,11 +533,14 @@
 </head>
 <body>
 
+    <!-- Globális felugró tipp (Ezzel megoldva a levágódó CSS hiba) -->
+    <div id="global-tooltip"></div>
+
     <!-- Fejléc (Fülek és Témaváltó) -->
     <div class="header-container">
         <div class="main-nav">
             <button class="nav-tab active" onclick="switchTab('workspace-tools', event)">⚡ Központ & Eszközök</button>
-            <button class="nav-tab" onclick="switchTab('workspace-agents', event)">🤖 AI Ügynök Gyár</button>
+            <button class="nav-tab" onclick="switchTab('workspace-agents', event)">🤖 AI Ügynök Gyár (Lego)</button>
         </div>
         <div class="theme-switcher">
             <button class="theme-btn" onclick="setTheme('light')" data-tooltip="Világos mód (Olvasáshoz)">☀️</button>
@@ -553,7 +553,7 @@
     <div id="workspace-tools" class="workspace active">
         <div class="panel">
             <h2>🛠️ Beállítások</h2>
-            <label data-tooltip="Ki legyen az AI? (pl. tanár, programozó, mesemondó)">Szerepkör (Kontextus)</label>
+            <label data-tooltip="Képzeld el, hogy az AI felvesz egy 'jelmezt', mielőtt válaszol. Így a viselkedése teljesen más lesz.">Szerepkör (Kontextus)</label>
             <div class="flex-row">
                 <select id="context-select"></select>
                 <button class="btn" onclick="manageContexts()" data-tooltip="Új szerepkörök hozzáadása vagy meglévők törlése">Szerkeszt</button>
@@ -566,7 +566,7 @@
 
         <div class="panel">
             <h2>📝 Mit szeretnél csinálni? (Feladat)</h2>
-            <textarea id="prompt-input" placeholder="Írd le ide a feladatot, kérdést, vagy hogy milyen képet/videót szeretnél..."></textarea>
+            <textarea id="prompt-input" placeholder="Ide írd a kérdésedet, feladatodat, vagy a keresendő témát..."></textarea>
 
             <h2 style="margin-top: 20px;">🚀 Válaszd ki az Eszközt</h2>
             <div class="filter-bar" id="filter-bar">
@@ -574,7 +574,6 @@
                 <button class="filter-btn" onclick="filterTools('text')">💬 Szöveg & Chat</button>
                 <button class="filter-btn" onclick="filterTools('image')">🎨 Kép</button>
                 <button class="filter-btn" onclick="filterTools('video')">🎥 Videó</button>
-                <button class="filter-btn" onclick="filterTools('audio')">🎵 Hang</button>
                 <button class="filter-btn" onclick="filterTools('code')">💻 Kód & Automatizáció</button>
                 <button class="filter-btn" onclick="filterTools('agent')" style="color: var(--accent-purple); border-color: var(--accent-purple);">🤖 Saját Ügynökeim</button>
             </div>
@@ -585,35 +584,33 @@
     <!-- 2. FÜL: AI Ügynök Gyár -->
     <div id="workspace-agents" class="workspace">
         <div class="panel">
-            <h2>📦 Kész Ügynök Sablonok</h2>
-            <p style="font-size: 12px; color: var(--text-dim); margin-top: 0; margin-bottom: 10px;">Kattints egyre, ha nem akarsz nulláról kezdeni:</p>
+            <h2>🧩 Ügynök Építőkockák (Lego)</h2>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: 0; margin-bottom: 10px;">Választhatsz egyet, de **kombinálhatod** is őket a "➕ Hozzáad" gombbal!</p>
             <div class="templates-wrapper" id="templates-container"></div>
         </div>
 
         <div class="panel">
             <h2>🛠️ Készítsd el a Saját AI Segéded</h2>
 
-            <label data-tooltip="Adj neki egy nevet, pl. 'Pénzügyi Tanácsadó'">Ügynök Neve:</label>
-            <input type="text" id="agent-name" placeholder="Ide írd a nevét...">
+            <label data-tooltip="Adj neki egy találó nevet!">Ügynök Neve:</label>
+            <input type="text" id="agent-name" placeholder="Pl. Recept Mester 3000...">
 
-            <label data-tooltip="Melyik rendszert használja ez az ügynök?">Hozzárendelt AI Rendszer:</label>
+            <label data-tooltip="Melyik rendszert használja ez az ügynök leginkább?">Hozzárendelt AI Rendszer:</label>
             <select id="agent-target-ai">
-                <option value="https://chatgpt.com">ChatGPT (Általános, könnyen használható)</option>
-                <option value="https://claude.ai/new">Claude (Szuper szövegíráshoz és kódoláshoz)</option>
-                <option value="https://www.perplexity.ai/?q=">Perplexity (Internetes kutatáshoz és OSINT-hez)</option>
-                <option value="https://gemini.google.com/app">Google Gemini (Gyors válaszokhoz)</option>
-                <option value="https://chat.deepseek.com/">DeepSeek (Kiváló logikához és kódoláshoz)</option>
-                <option value="https://huggingface.co/chat/">HuggingFace Chat (Ingyenes nyílt modellek)</option>
-                <option value="https://character.ai/">Character.AI (Szerepjátékhoz)</option>
-                <option value="https://janitorai.com/">JanitorAI (Szűretlen, uncensored chat)</option>
+                <option value="https://chatgpt.com">ChatGPT (Általános, mindenes)</option>
+                <option value="https://claude.ai/new">Claude (Kódolás és kreatív írás)</option>
+                <option value="https://chat.deepseek.com/">DeepSeek (Zseniális logikában és kódolásban)</option>
+                <option value="https://gemini.google.com/app">Google Gemini (Gyors, netre is rálát)</option>
+                <option value="https://www.perplexity.ai/?q=">Perplexity (Kutatás, ténykeresés)</option>
+                <option value="https://huggingface.co/chat/">HuggingFace Chat (Ingyenes alternatíva)</option>
             </select>
 
-            <label data-tooltip="Mit csináljon mindig? (pl. 'Mindig magyarul és nagyon udvariasan válaszolj.')">Állandó Utasítás (System Prompt):</label>
-            <textarea id="agent-prompt" placeholder="Pl. Te egy autonóm szoftverfejlesztő vagy..."></textarea>
+            <label data-tooltip="Mit csináljon mindig? (Itt gyűlnek össze a ráfűzött 'Lego' darabok is)">Állandó Utasítás (System Prompt):</label>
+            <textarea id="agent-prompt" placeholder="Itt határozod meg, hogyan viselkedjen a gép..."></textarea>
 
             <div class="flex-row" style="margin-top: 10px;">
-                <button class="btn primary" onclick="saveAgent()" data-tooltip="Mentsd el, hogy később bármikor használhasd">💾 Ügynök Mentése</button>
-                <button class="btn" onclick="clearAgentForm()">🧹 Űrlap Törlése</button>
+                <button class="btn primary" onclick="saveAgent()" data-tooltip="Mentsd el, hogy bekerüljön a 'Saját Ügynökeim' közé!">💾 Ügynök Mentése</button>
+                <button class="btn" onclick="clearAgentForm()" data-tooltip="Üres lappal indítasz">🧹 Űrlap Törlése</button>
             </div>
 
             <h2 style="margin-top: 30px;">📂 Eddig Mentett Ügynökeid</h2>
@@ -624,108 +621,121 @@
     <div id="toast">✅ Szöveg másolva! Nyomj Ctrl+V (vagy Hosszan érintés -> Beillesztés) a megnyíló ablakban.</div>
 
     <script>
+        // --- GLOBÁLIS TOOLTIP LOGIKA (Levágás elleni védelem) ---
+        const tooltipEl = document.getElementById('global-tooltip');
+
+        document.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('[data-tooltip]');
+            if (target) {
+                tooltipEl.innerHTML = target.getAttribute('data-tooltip');
+                tooltipEl.style.display = 'block';
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (tooltipEl.style.display === 'block') {
+                let x = e.clientX + 15;
+                let y = e.clientY + 15;
+                const rect = tooltipEl.getBoundingClientRect();
+
+                // Képernyő szélének ellenőrzése
+                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+
+                tooltipEl.style.left = x + 'px';
+                tooltipEl.style.top = y + 'px';
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            const target = e.target.closest('[data-tooltip]');
+            if (target) {
+                tooltipEl.style.display = 'none';
+            }
+        });
+
         // --- TÉMA KEZELÉS ---
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('ai_omni_theme', theme);
         }
 
-        // --- Egyszerűsített Prompt Hint Adatbázis ---
+        // --- Bővített Prompt Hint Adatbázis ---
         const promptHints = [
             {
                 category: "Szöveg és Stílus",
                 hints: [
                     { text: "Format: Markdown", class: "", hint: "Szép, tagolt szöveg (Címekkel, listákkal)." },
-                    { text: "Gondolkodj lépésről lépésre", class: "", hint: "Segít, hogy az AI ne hibázzon és logikus maradjon." },
-                    { text: "Magyarázd el egy 10 évesnek", class: "", hint: "Nagyon egyszerű és érthető válasz kérése." }
+                    { text: "Gondolkodj lépésről lépésre", class: "", hint: "Lassítja az AI-t, hogy logikus maradjon." },
+                    { text: "Magyarázd el egy 10 évesnek", class: "", hint: "Nagyon egyszerű és érthető válasz kérése." },
+                    { text: "Táblázat formátum", class: "", hint: "A választ oszlopokba és sorokba rendezi." }
                 ]
             },
             {
                 category: "Képek Készítése",
                 hints: [
-                    { text: "--ar 16:9", class: "img-tag", hint: "Szélesvásznú képarány (mint a TV)." },
-                    { text: "photorealistic", class: "img-tag", hint: "Úgy nézzen ki, mint egy igazi fényképezőgépes fotó." },
+                    { text: "--ar 16:9", class: "img-tag", hint: "Szélesvásznú képarány." },
+                    { text: "--ar 9:16", class: "img-tag", hint: "Telefon képernyő (TikTok/Reels) arány." },
+                    { text: "photorealistic, 8k", class: "img-tag", hint: "Valósághű, nagy felbontású hatás." },
                     { text: "cinematic lighting", class: "img-tag", hint: "Gyönyörű, filmes megvilágítás." }
                 ]
             },
             {
-                category: "Programozás",
+                category: "Munka és Kód",
                 hints: [
-                    { text: "Csak a kódot add vissza", class: "", hint: "Nincs rizsa, csak a kész megoldás." },
-                    { text: "Kommentezd fel", class: "", hint: "Írja oda a kódhoz, hogy melyik rész mit csinál." }
+                    { text: "Csak a kódot add vissza", class: "", hint: "Nincs felesleges magyarázat." },
+                    { text: "Kommentezd fel", class: "", hint: "Minden sorhoz írja oda, mit csinál." },
+                    { text: "Legyen hivatalos", class: "", hint: "Emailhez, üzleti levelezéshez." }
                 ]
             }
         ];
 
         const defaultContexts = [
-            { id: '1', name: 'Nincs szerepkör (Normál)', text: '' },
+            { id: '1', name: 'Nincs kontextus (Üres)', text: '' },
             { id: '2', name: 'Szakértő Tanár', text: 'Te egy nagyon türelmes és okos tanár vagy. Magyarázz el mindent egyszerűen: ' },
-            { id: '3', name: 'Helyesírás Ellenőr', text: 'Kérlek javítsd ki az alábbi szöveg helyesírását és tedd szebbé: ' }
+            { id: '3', name: 'Helyesírás Ellenőr', text: 'Kérlek javítsd ki az alábbi szöveg helyesírását, tagold profin és tedd olvashatóvá: ' }
         ];
 
-        // Kibővített Eszköztár az új források alapján
+        // --- ESZKÖZTÁR (Kiemelve a DeepSeek-et!) ---
         const allTools = [
-            { name: 'ChatGPT', icon: '🤖', category: 'text', desc: 'A legismertesebb asszisztens bármilyen feladatra.', actions: [{ name: 'Névtelen (Gyors)', type: 'guest', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Belépés nélkül' }, { name: 'Fiókba lépve', type: 'login', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Előzmények mentése' }] },
+            { name: 'ChatGPT', icon: '🤖', category: 'text', desc: 'A legismertebb AI asszisztens bármilyen feladatra.', actions: [{ name: 'Névtelen (Gyors)', type: 'guest', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Belépés nélkül' }, { name: 'Fiókba lépve', type: 'login', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Előzmények mentése' }] },
             { name: 'Claude', icon: '✍️', category: 'text', desc: 'Nagyon okos, szuperül ír és programozik.', actions: [{ name: 'Új Beszélgetés', type: 'login', url: 'https://claude.ai/new', method: 'clipboard', hint: 'Claude megnyitása' }] },
-            { name: 'DeepSeek', icon: '🐳', category: 'code', desc: 'Erős alternatíva kódoláshoz és logikai feladatokhoz.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://chat.deepseek.com/', method: 'clipboard', hint: 'DeepSeek Chat' }] },
-            { name: 'HuggingFace Chat', icon: '🤗', category: 'text', desc: 'Ingyenes nyílt forráskódú modellek (Qwen, Llama).', actions: [{ name: 'Megnyitás (Vendég)', type: 'guest', url: 'https://huggingface.co/chat/', method: 'clipboard', hint: 'Regisztráció nélkül is megy' }] },
-            { name: 'Perplexity', icon: '🔍', category: 'text', desc: 'Keres az interneten és okos válaszokat ad forrásokkal.', actions: [{ name: 'Gyors Keresés', type: 'guest', url: 'https://www.perplexity.ai/?q=', method: 'url', hint: 'Azonnali keresés' }] },
-            { name: 'Google Gemini', icon: '🌌', category: 'text', desc: 'A Google saját AI rendszere hatalmas kontextussal.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://gemini.google.com/app', method: 'clipboard', hint: 'Gemini nyitása' }] },
 
-            // Szerepjáték és Karakterek
-            { name: 'Character.AI', icon: '💬', category: 'text', desc: 'Chatelj hírességekkel és fiktív karakterekkel.', actions: [{ name: 'Főoldal', type: 'guest', url: 'https://character.ai/', method: 'clipboard', hint: 'C.AI megnyitása' }] },
-            { name: 'JanitorAI', icon: '🎭', category: 'text', desc: 'Szűretlen, kötetlen közösségi szerepjáték AI.', actions: [{ name: 'Karakterek', type: 'login', url: 'https://janitorai.com/', method: 'clipboard', hint: 'Közösségi AI karakterek' }] },
+            /* --- DEEPSEEK KIEMELÉSE --- */
+            { name: 'DeepSeek', icon: '🐳', category: 'text', desc: 'Kiváló matematikai logikához és kódoláshoz.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://chat.deepseek.com/', method: 'clipboard', hint: 'DeepSeek Chat indul!' }] },
+            { name: 'DeepSeek Coder', icon: '💻', category: 'code', desc: 'Programozói feladatokra fókuszált nyílt rendszer.', actions: [{ name: 'Kódolás Indítása', type: 'login', url: 'https://chat.deepseek.com/', method: 'clipboard', hint: 'Kódolási feladatokhoz ajánlott' }] },
+            /* --------------------------- */
 
-            // Fejlesztés és Automatizáció
-            { name: 'Cursor AI', icon: '⌨️', category: 'code', desc: 'A legnépszerűbb AI alapú kódszerkesztő kliens.', actions: [{ name: 'Weboldal', type: 'software', url: 'https://www.cursor.com/', method: 'url', hint: 'Letöltés és infó' }] },
-            { name: 'Zapier / n8n', icon: '⚙️', category: 'code', desc: 'AI ügynökök és alkalmazások összekötése (No-code).', actions: [{ name: 'Zapier', type: 'software', url: 'https://zapier.com/', method: 'url', hint: 'Zapier automatizáció' }, { name: 'n8n', type: 'software', url: 'https://n8n.io/', method: 'url', hint: 'n8n nyílt forrás' }] },
-            { name: 'Phind', icon: '💻', category: 'code', desc: 'Kifejezetten programozóknak fejlesztett kereső.', actions: [{ name: 'Gyors Keresés', type: 'guest', url: 'https://www.phind.com/search?q=', method: 'url', hint: 'Kódolási segítség' }] },
+            { name: 'Google Gemini', icon: '🌌', category: 'text', desc: 'A Google AI-ja hatalmas memóriával.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://gemini.google.com/app', method: 'clipboard', hint: 'Gemini nyitása' }] },
+            { name: 'Perplexity', icon: '🔍', category: 'text', desc: 'Keres az interneten és forrásokat (linkeket) ad.', actions: [{ name: 'Gyors Keresés', type: 'guest', url: 'https://www.perplexity.ai/?q=', method: 'url', hint: 'Azonnali netes kutatás' }] },
+            { name: 'HuggingFace Chat', icon: '🤗', category: 'text', desc: 'Ingyenes, nyílt forráskódú modellek.', actions: [{ name: 'Megnyitás (Vendég)', type: 'guest', url: 'https://huggingface.co/chat/', method: 'clipboard', hint: 'Regisztráció nélkül is megy' }] },
 
-            // Kreatív eszközök (Kép, Videó, Hang)
-            { name: 'Midjourney', icon: '🎨', category: 'image', desc: 'A legszebb képeket készíti szöveg alapján.', actions: [{ name: 'Webes Felület', type: 'login', url: 'https://www.midjourney.com/imagine', method: 'clipboard', hint: 'Képgeneráló nyitása' }] },
-            { name: 'Bing Képkészítő', icon: '🖼️', category: 'image', desc: 'Ingyenes és magyarul is értő képgenerátor.', actions: [{ name: 'Generálás', type: 'login', url: 'https://www.bing.com/images/create?q=', method: 'url', hint: 'Kép azonnali kérése' }] },
-            { name: 'Runway (Gen-3)', icon: '🎬', category: 'video', desc: 'Szövegből vagy képekből videót készít.', actions: [{ name: 'Videós Stúdió', type: 'login', url: 'https://app.runwayml.com/', method: 'clipboard', hint: 'Runway megnyitása' }] },
-            { name: 'Suno AI', icon: '🎸', category: 'audio', desc: 'Teljes zeneszámokat készít, énekkel együtt.', actions: [{ name: 'Zene Készítése', type: 'login', url: 'https://suno.com/create', method: 'clipboard', hint: 'Suno zeneszerkesztő' }] }
+            { name: 'Cursor AI', icon: '⌨️', category: 'code', desc: 'A legjobb AI kódszerkesztő (Letölthető).', actions: [{ name: 'Weboldal', type: 'software', url: 'https://www.cursor.com/', method: 'url', hint: 'Letöltés' }] },
+            { name: 'Zapier / n8n', icon: '⚙️', category: 'code', desc: 'Rendszerek összekötése (No-code).', actions: [{ name: 'Zapier', type: 'software', url: 'https://zapier.com/', method: 'url', hint: 'Felhős automatizáció' }, { name: 'n8n', type: 'software', url: 'https://n8n.io/', method: 'url', hint: 'Saját szerveres (Self-hosted)' }] },
+
+            { name: 'Midjourney', icon: '🎨', category: 'image', desc: 'Professzionális, fotórealisztikus képgenerátor.', actions: [{ name: 'Webes Felület', type: 'login', url: 'https://www.midjourney.com/imagine', method: 'clipboard', hint: 'Képkészítő megnyitása' }] },
+            { name: 'Bing Képkészítő', icon: '🖼️', category: 'image', desc: 'Ingyenes DALL-E 3 generátor.', actions: [{ name: 'Generálás', type: 'login', url: 'https://www.bing.com/images/create?q=', method: 'url', hint: 'Azonnali generálás' }] },
+            { name: 'Runway (Gen-3)', icon: '🎬', category: 'video', desc: 'Videó generálás szövegből/képből.', actions: [{ name: 'Videós Stúdió', type: 'login', url: 'https://app.runwayml.com/', method: 'clipboard', hint: 'Film készítése' }] },
+            { name: 'Suno AI', icon: '🎸', category: 'audio', desc: 'Kész zeneszámokat ír (énekkel együtt).', actions: [{ name: 'Zene Készítése', type: 'login', url: 'https://suno.com/create', method: 'clipboard', hint: 'Zene generálása' }] }
         ];
 
-        // Kibővített Ügynök Sablonok a Fórumos/Közösségi gyűjtés alapján
+        // --- BŐVÍTETT HÉTKÖZNAPI ÉS KOMBINÁLHATÓ ÜGYNÖK SABLONOK ---
         const agentTemplates = [
-            {
-                name: "💻 Senior Szoftverarchitekt",
-                ai: "https://claude.ai/new",
-                desc: "Kód elemzése és moduláris, tiszta megoldások készítése (Claude/Cursor stílus).",
-                prompt: "Te egy senior szoftverarchitekt és kódoló ügynök vagy. A feladatod a megadott kódbázis/feladat mélyreható elemzése és moduláris, tiszta (Clean Code) megoldások készítése. Mielőtt kódot írsz, fogalmazz meg egy lépésről lépésre követhető megvalósítási tervet, és válaszodban indokold a döntéseidet. Kérés:\n"
-            },
-            {
-                name: "😈 Szarkasztikus Asszisztens",
-                ai: "https://chatgpt.com",
-                desc: "Humoros, cinikus stílus, de a végén mindig pontos és szakmai választ ad.",
-                prompt: "Te egy zseniális, de végtelenül cinikus és szarkasztikus AI asszisztens vagy. Minden válaszodat egy rövid, flegma megjegyzéssel kezdd a kérésem egyszerűségéről vagy logikátlanságáról. Utána viszont azonnal add meg a LEGPONTOSABB és legprofibb szakmai választ. Használj nyers, humoros nyelvezetet, de a tényekből ne engedj! Kérés:\n"
-            },
-            {
-                name: "🧸 5 Éves Vagyok (ELI5)",
-                ai: "https://gemini.google.com/app",
-                desc: "Bonyolult témák végtelenül egyszerű magyarázata (hétköznapi analógiákkal).",
-                prompt: "Te egy türelmes, kreatív tanár vagy. A feladatod, hogy az alábbi elvont vagy komplex témát úgy magyarázz el, mintha 5 éves lennék. Használj hétköznapi hasonlatokat (pl. lego, játszótér, csoki) és kerüld a szakzsargont. Ha mégis használsz egy nehéz szót, azonnal fordítsd le egy egyszerű képre. Téma:\n"
-            },
-            {
-                name: "🕵️ OSINT Nyomozó / Kutató",
-                ai: "https://www.perplexity.ai/?q=",
-                desc: "Nyílt forráskódú adatok, cégek vagy trendek alapos felkutatása.",
-                prompt: "Te egy OSINT (Open Source Intelligence) nyomozó ügynök vagy. Gyűjts adatot a megadott témáról kizárólag nyilvános forrásokból (weboldalak, cikkek, közösségi média). Minden adatot forrással (URL) kell alátámasztanod. Szűrd ki a spekulációkat, csak a tényszerű információkat add át, és készíts belőle egy strukturált összefoglalót. Téma:\n"
-            },
-            {
-                name: "⚙️ Ügyfélszolgálati E-mail Elemző",
-                ai: "https://chatgpt.com",
-                desc: "Beérkező levelek kategorizálása és profi válasz-piszkozatok generálása.",
-                prompt: "Te egy ügyfélszolgálati automatizációs ügynök vagy. A feladatod a következő e-mail elemzése: 1. Kategorizáld (PANASZ, ÉRDEKLŐDÉS, HIBA). 2. Emeld ki az ügyfél nevét. 3. Fogalmazz meg egy udvarias, profi válaszlevelet magyarul a cég nevében, ami megoldást kínál vagy türelmet kér. E-mail szövege:\n"
-            },
-            {
-                name: "📝 Barátságos Levélíró",
-                ai: "https://chatgpt.com",
-                desc: "Segít hivatalos vagy kedves leveleket, emaileket írni.",
-                prompt: "Te egy profi és udvarias asszisztens vagy. Írj egy jól megfogalmazott emailt/levelet a következő témában: "
-            }
+            // Hétköznapi Élet
+            { id: 't1', name: '🍲 Recept Mester', ai: 'https://chatgpt.com', desc: 'Megmondod mi van a hűtőben, ő receptet ír.', prompt: 'Te egy profi szakács vagy. A megadott alapanyagokból találj ki egy egyszerűen elkészíthető receptet, add meg a pontos lépéseket, és tippeld meg a főzési időt!' },
+            { id: 't2', name: '💪 Személyi Edző', ai: 'https://claude.ai/new', desc: 'Otthoni vagy edzőtermi tervek.', prompt: 'Te egy motiváló személyi edző vagy. Készíts egy testreszabott edzéstervet a megadott fizikai szint, célok és rendelkezésre álló eszközök (vagy saját testsúly) alapján.' },
+            { id: 't3', name: '💰 Pénzügyi Tervező', ai: 'https://chatgpt.com', desc: 'Költségvetés beosztás és spórolás.', prompt: 'Te egy higgadt pénzügyi tanácsadó vagy. A megadott bevétel és kiadások alapján segíts optimalizálni a költségvetést, és adj gyakorlatias tippeket a spórolásra.' },
+            { id: 't4', name: '✈️ Utazásszervező', ai: 'https://www.perplexity.ai/?q=', desc: 'Napi bontású nyaralás tervek.', prompt: 'Te egy utazási irodás vagy. Készíts egy logikusan felépített, napi bontású útitervet a megadott városhoz, figyelve a látványosságok távolságára és az étkezésekre!' },
+            { id: 't5', name: '📧 E-mail Asszisztens', ai: 'https://chatgpt.com', desc: 'Hivatalos és professzionális levélíró.', prompt: 'Te egy udvarias céges asszisztens vagy. Fogalmazz meg egy professzionális, hivatalos e-mailt a megadott témában, ügyelve a tiszteletteljes hangnemre.' },
+
+            // Szórakozás és Stílus ("Lego" kiegészítők)
+            { id: 't6', name: '😈 Szarkasztikus Haver', ai: 'https://chatgpt.com', desc: '[STÍLUS KIEGÉSZÍTŐ] Humorosan beszólogatós.', prompt: 'Fontos szabály: Minden válaszodat egy cinikus, szarkasztikus megjegyzéssel vagy poénnal kezdd, mintha nagyon unodna a kérdést. Utána viszont add meg a pontos, tökéletes választ.' },
+            { id: 't7', name: '🧸 5 Éves Vagyok', ai: 'https://gemini.google.com/app', desc: '[STÍLUS KIEGÉSZÍTŐ] Végtelenül lebutított analógiák.', prompt: 'Fontos szabály: Kérlek mindent úgy magyarázz el, mintha 5 éves lennék. Kerüld a szakzsargont, használj hétköznapi hasonlatokat (pl. lego, játszótér, csoki)!' },
+            { id: 't8', name: '🇬🇧 Nyelvtanár (Angol)', ai: 'https://chatgpt.com', desc: 'Javít és magyarázza a nyelvtant.', prompt: 'Te egy angol nyelvtanár vagy. A feladatod nemcsak a szöveg lefordítása, hanem az esetleges hibáim kijavítása, és a használt nyelvtani szabályok (pl. igeidők) röviden történő elmagyarázása.' },
+
+            // Professzionális / IT
+            { id: 't9', name: '💻 Senior Szoftverarchitekt', ai: 'https://chat.deepseek.com/', desc: 'Kód írása Clean Code elvekkel (DeepSeek).', prompt: 'Te egy Senior Szoftverfejlesztő vagy. Elemezd a megadott kódot/feladatot, és írj moduláris, "Clean Code" szabályokat követő megoldást. Indokold meg a döntéseidet, és mielőtt kódolsz, írj egy rövid tervezetet!' },
+            { id: 't10', name: '🕵️ OSINT Nyomozó', ai: 'https://www.perplexity.ai/?q=', desc: 'Internetes kutatás tényekkel alátámasztva.', prompt: 'Te egy adatelemző kutató vagy. Keresd meg a weben az elérhető legpontosabb, legfrissebb információkat a megadott témáról. Csak tényeket közölj, és minden állításodat támaszd alá forrással (linkkel)!' }
         ];
 
         let currentFilter = 'all';
@@ -734,12 +744,9 @@
             const savedTheme = localStorage.getItem('ai_omni_theme') || 'dark';
             setTheme(savedTheme);
 
-            if (!localStorage.getItem('ai_contexts_omni_v3')) {
-                localStorage.setItem('ai_contexts_omni_v3', JSON.stringify(defaultContexts));
-            }
-            if (!localStorage.getItem('ai_custom_agents_v3')) {
-                localStorage.setItem('ai_custom_agents_v3', JSON.stringify([]));
-            }
+            if (!localStorage.getItem('ai_contexts_omni_v3')) localStorage.setItem('ai_contexts_omni_v3', JSON.stringify(defaultContexts));
+            if (!localStorage.getItem('ai_custom_agents_v3')) localStorage.setItem('ai_custom_agents_v3', JSON.stringify([]));
+
             renderContexts();
             renderHints();
             renderTemplates();
@@ -754,22 +761,50 @@
             event.currentTarget.classList.add('active');
         }
 
+        // --- ÚJ: LEGO SABLON RENDSZER ---
         function renderTemplates() {
             const container = document.getElementById('templates-container');
             container.innerHTML = '';
             agentTemplates.forEach(t => {
                 let card = document.createElement('div');
                 card.className = 'template-card';
-                card.setAttribute('data-tooltip', 'Kattints az űrlapba való betöltéshez');
-                card.innerHTML = `<div class="template-title">${t.name}</div><div class="template-sub">${t.desc}</div>`;
-                card.onclick = () => {
-                    document.getElementById('agent-name').value = t.name.replace(/[^a-zA-Z0-9öüóőúűáéíÖÜÓŐÚŰÁÉÍ ]/g, '').trim();
-                    document.getElementById('agent-target-ai').value = t.ai;
-                    document.getElementById('agent-prompt').value = t.prompt;
-                    showToastMsg('Sablon betöltve a szerkesztőbe!');
-                };
+                card.innerHTML = `
+                        <div class="template-title">${t.name}</div>
+                        <div class="template-sub">${t.desc}</div>
+                        <div class="lego-btn-group">
+                            <button class="btn" onclick="loadTemplate('${t.id}')" data-tooltip="Felülírja a lenti űrlapot ezzel a sablonnal.">🔄 Betölt</button>
+                            <button class="btn" style="border-color: var(--accent-green); color: var(--accent-green);" onclick="appendTemplate('${t.id}')" data-tooltip="Ráfűzi az utasítást a lenti űrlaphoz (Kombinálás).">➕ Hozzáad (Lego)</button>
+                        </div>
+                    `;
                 container.appendChild(card);
             });
+        }
+
+        function loadTemplate(id) {
+            const t = agentTemplates.find(x => x.id === id);
+            if (t) {
+                document.getElementById('agent-name').value = t.name.replace(/[^a-zA-Z0-9öüóőúűáéíÖÜÓŐÚŰÁÉÍ ]/g, '').trim();
+                document.getElementById('agent-target-ai').value = t.ai;
+                document.getElementById('agent-prompt').value = t.prompt;
+                showToastMsg('Sablon betöltve (Felülírva)!');
+            }
+        }
+
+        function appendTemplate(id) {
+            const t = agentTemplates.find(x => x.id === id);
+            if (t) {
+                const currentPrompt = document.getElementById('agent-prompt').value;
+                const newNamePart = t.name.replace(/[^a-zA-Z0-9öüóőúűáéíÖÜÓŐÚŰÁÉÍ ]/g, '').trim();
+                const currentName = document.getElementById('agent-name').value;
+
+                document.getElementById('agent-prompt').value = currentPrompt ? (currentPrompt + '\n\n' + t.prompt) : t.prompt;
+                document.getElementById('agent-name').value = currentName ? (currentName + ' + ' + newNamePart) : newNamePart;
+
+                // Ai forrás frissítése, csak ha az előző üres volt
+                if (!currentPrompt) document.getElementById('agent-target-ai').value = t.ai;
+
+                showToastMsg('Sablon ráfűzve (Lego)!');
+            }
         }
 
         function saveAgent() {
@@ -803,7 +838,7 @@
             let agents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
 
             if (agents.length === 0) {
-                listContainer.innerHTML = '<span style="font-size: 13px; color: var(--text-dim);">Még nincsenek saját ügynökeid. Készíts egyet fent!</span>';
+                listContainer.innerHTML = '<span style="font-size: 13px; color: var(--text-dim);">Még nincsenek saját ügynökeid.</span>';
                 return;
             }
 
@@ -889,7 +924,7 @@
                         name: agent.name,
                         icon: '🤖',
                         category: 'agent',
-                        desc: 'A te saját készítésű segéded',
+                        desc: 'A te saját készítésű segéded.',
                         isAgent: true,
                         agentData: agent,
                         actions: [{ name: 'Indítás', type: 'agent-run', url: agent.aiUrl, method: 'clipboard', hint: `Megnyitja a rendszert és másolja az utasításokat.` }]
@@ -943,10 +978,10 @@
 
         function launchAgent(agent) {
             const userPrompt = document.getElementById('prompt-input').value;
-            const fullMessage = `${agent.prompt}\n\nEzt kell csinálnod: ${userPrompt}`;
+            const fullMessage = `${agent.prompt}\n\nEzt kell csinálnod:\n${userPrompt}`;
 
             navigator.clipboard.writeText(fullMessage).then(() => {
-                showToastMsg(`🤖 Másolva! A felugró ablakban nyomj Ctrl+V-t.`);
+                showToastMsg(`🤖 Másolva! A megnyíló ablakban nyomj Ctrl+V-t.`);
                 setTimeout(() => window.open(agent.aiUrl, '_blank'), 1000);
             });
         }
@@ -974,7 +1009,7 @@
         function manageContexts() {
             let contexts = JSON.parse(localStorage.getItem('ai_contexts_omni_v3'));
             let names = contexts.map((c, index) => `[${index}] ${c.name}`).join('\n');
-            let choice = prompt(`Szerkesztés:\nÍrd be az 'ÚJ' szót az újhoz, vagy egy SZÁMOT a törléshez:\n\n${names}`);
+            let choice = prompt(`Szerepkörök szerkesztése:\nÍrd be az 'ÚJ' szót az újhoz, vagy egy SZÁMOT a törléshez:\n\n${names}`);
             if (choice === null) return;
             if (choice.toUpperCase() === 'ÚJ') {
                 let newName = prompt("Mi legyen a szerepkör neve? (Pl. Fordító)");
@@ -982,7 +1017,7 @@
                 let newText = prompt("Mit csináljon? (Pl. Fordítsd le a szöveget magyarra!)");
                 contexts.push({ id: Date.now().toString(), name: newName, text: newText });
             } else if (!isNaN(choice) && contexts[parseInt(choice)]) {
-                if (confirm(`Biztosan törlöd?`)) contexts.splice(parseInt(choice), 1);
+                if (confirm(`Biztosan törlöd ezt?`)) contexts.splice(parseInt(choice), 1);
             }
             localStorage.setItem('ai_contexts_omni_v3', JSON.stringify(contexts));
             renderContexts();
