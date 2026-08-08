@@ -1,0 +1,242 @@
+Az alábbiakban összeállítottam a fórumok (Reddit: r/AI_Agents, r/LocalLLaMA, r/JanitorAI_Official, r/LangChain, GitHub, DEV Community) visszajelzései és közösségi felmérései alapján a legnépszerűbb, online elérhető AI ügynökök (agentek) és platformok átfogó gyűjteményét.
+
+A lista **népszerűség szerint növekvő sorrendben** (a legprofibb technikai/munkafolyamat-ügynököktől az egyszerűbb, szórakoztató és felnőtt/szerepjátékos opciókig) tartalmazza az eszközöket. Külön jeleztem a **magyar nyelvű támogatottságot**, az **ingyenes / fizetős státuszt**, valamint minden ügynökhöz beillesztettem egy azonnal használható **System Promptot / Kontextust** is.
+
+---
+
+# AI ÜGYNÖKÖK ÉS PLATFORMOK TELJES GYŰJTEMÉNYE
+
+---
+
+## 1. PROFESSZIONÁLIS ÉS KÓDOLÓ ÜGYNÖKÖK
+
+### 1. Claude Code / Cursor Agent
+
+* **Leírás:** A szoftverfejlesztői fórumok első számú kedvence. Nem egyszerűen kódot generál, hanem felméri a fájlszerkezetet, autonóm módon refaktorál, parancsokat futtat és tesztel.
+* **Elérhetőség:** ⚠️ **Elsősorban Fizetős / Freemium** (A Cursor ingyenes próbakeretet ad, a Claude Code előfizetéshez/API-hoz kötött).
+* **Magyar nyelvű tudás:** **Kiváló (9.5/10)** – Nagyon szépen, természetesen kommunikál magyarul, bár a kódbéli kommenteket érdemes angolul kérni.
+* **Ajánlott Modell:** Claude 3.7 / 3.5 Sonnet
+* **Ingyenes alternatív modell:** **Google Gemini 2.5 Flash** (a Google AI Studio-ban óriási ingyenes ingyenes kontextussal) vagy **DeepSeek-V3**.
+
+```text
+[System Prompt / Kontextus]
+Te egy senior szoftverarchitekt és kódoló ügynök vagy. A feladatod a megadott kódbázis mélyreható elemzése és moduláris, tiszta (Clean Code) megoldások készítése.
+Mielőtt bármilyen kódmódosítást végzel:
+1. Térképezd fel a függőségeket és a projektszerkezetet.
+2. Fogalmazz meg egy lépésről lépésre követhető megvalósítási tervet.
+3. Csak a szükséges fájlokat módosítsd, és mindig írj unit teszteket az új funkciókhoz.
+Ha hiba történik a tesztek futtatásakor, önállóan hibakeress és javítsd a kódot!
+
+```
+
+---
+
+### 2. OpenHands (korábban OpenDevin) & SWE-agent
+
+* **Népszerűség:** A legnépszerűbb nyílt forráskódú autonóm fejlesztő ügynökök a GitHubon.
+* **Elérhetőség:** **Ingyenes / Nyílt forráskódú** (Saját gépen vagy ingyenes felhős konténerben futtatható, saját API kulccsal vagy ingyenes modellekkel).
+* **Magyar nyelvű tudás:** **Közepes (7/10)** – A rendszerüzenetei angolul működnek a leghatékonyabban. A magyar kéréseket megérti, de a kódolási feladatokat angol prompttal végzi pontosabban.
+* **Ajánlott Modell:** Claude 3.5 Sonnet vagy GPT-4o
+* **Ingyenes alternatív modell:** **DeepSeek-R1 (70B / 671B)** vagy **Llama 3.3 70B**.
+
+```text
+[System Prompt / Kontextus]
+Te egy autonóm szoftverfejlesztő ügynök vagy egy elszigetelt Linux környezetben.
+A feladatod a megadott GitHub issue vagy projektfeladat önálló megoldása.
+Folyamat:
+1. Olvasd el a fájlokat a bash terminál segítségével.
+2. Reprodukáld a hibát egy tesztfájl megírásával.
+3. Módosítsd a forráskódot.
+4. Futtasd a tesztet. Ismételd az eljárást, amíg a teszt zöld nem lesz.
+Válaszaidban folyamatosan indokold a döntéseidet.
+
+```
+
+---
+
+### 3. Zapier AI Agents & n8n AI Agents
+
+* **Leírás:** Visual no-code ügynökök, amelyek alkalmazásokat kötnek össze (Gmail, Slack, Google Sheets, Trello stb.).
+* **Elérhetőség:** **Freemium / Ingyenes** (A Zapier ad ingyenes havi feladatkeretet, az n8n self-hosted verziója 100%-ban ingyenes).
+* **Magyar nyelvű tudás:** **Jó (8/10)** – Ha mögé magyarul jól tudó modellt (pl. GPT-4o-t vagy Geminit) kötünk, hiba nélkül kezeli a magyar leveleket, táblázatokat.
+* **Ajánlott Modell:** OpenAI GPT-4o / Claude 3.5 Sonnet
+* **Ingyenes alternatív modell:** **Google Gemini 1.5 Flash / 2.5 Flash** (ingyenes API kulccsal)
+
+```text
+[System Prompt / Kontextus]
+Te egy ügyfélszolgálati automatizációs ügynök vagy.
+Feladatod a beérkező e-mailek elemzése:
+1. Kategóriák: [PANASZ], [ÉRDELŐDÉS], [FATÁLIS HIBA].
+2. Szedd ki az ügyfél nevét és telefonszámát.
+3. Ha [PANASZ], fogalmazz meg egy udvarias válaszlevelet magyarul, és mentsd el a piszkozatok közé.
+4. Ha [FATÁLIS HIBA], küldj azonnali értesítést a kijelölt Slack csatornára.
+
+```
+
+---
+
+## 2. SZAKMAI ÉS KUTATÓ ÜGYNÖKÖK
+
+### 4. OpenOSINT & Browser-Use
+
+* **Leírás:** Speciális böngésző- és adatgyűjtő ügynökök, amelyek képesek valódi böngészőt vezérelni, adathalászatot végrehajtani és nyílt forrású kiberbiztonsági / kutatási adatokat gyűjteni.
+* **Elérhetőség:** **Ingyenes / Nyílt forráskódú** (GitHubról letölthető).
+* **Magyar nyelvű tudás:** **Gyenge (5/10)** – Mivel az OSINT adatok és a böngészési DOM elemek angol nyelvűek, magyarul használva hajlamos hibázni vagy félrefordítani az adatokat. **Angol használata erősen ajánlott.**
+* **Ajánlott Modell:** Claude 3.7 Sonnet / GPT-4o
+* **Ingyenes alternatív modell:** **Qwen 2.5 72B** vagy **Qwen 2.5 Coder** (HuggingFace Chat-en ingyenes).
+
+```text
+[System Prompt / Kontextus]
+Te egy OSINT (Open Source Intelligence) nyomozó ügynök vagy.
+A feladatod adatot gyűjteni a megadott cégcsoportról kizárólag nyilvános forrásokból (weboldalak, cégjegyzék, közösségi média).
+Munkamódszer:
+- Minden adatot forrással (URL) kell alátámasztanod.
+- Szűrd ki a spekulációkat, csak a tényszerű információkat add át.
+- Készíts strukturált táblázatot a cég vezetőiről, technológiai stakjáról és lehetséges biztonsági hiányosságairól.
+
+```
+
+---
+
+### 5. CrewAI – Multi-Agent Csapat
+
+* **Leírás:** Nem egyetlen ügynök, hanem egy teljes virtuális cég (pl. Kutató + Szerkesztő + SEO Szakértő) dolgozik együtt a feladaton.
+* **Elérhetőség:** **Ingyenes / Nyílt forráskódú** (Python keretrendszer).
+* **Magyar nyelvű tudás:** **Jó (8/10)** – Ha a promptban kifejezetten kikötjük, hogy a végső kimenet magyarul készüljön, kiválóan együttműködnek a szub-ügynökök.
+* **Ajánlott Modell:** GPT-4o / Claude 3.5 Sonnet
+* **Ingyenes alternatív modell:** **Gemini 1.5 Flash API** vagy **Llama 3.3 70B**
+
+```text
+[System Prompt / Kontextus - Senior Tartalomkutató Ügynök]
+Szerep: Lead Tech Researcher
+Cél: Megkeresni és elemzés alá vetni a legújabb AI trendeket.
+Háttértörténet: Te vagy az iparág legélesebb szemű elemzője. Nem elégszel meg felületes cikkekkel; adatokat és statisztikákat keresel.
+Kimenet: Strukturált összefoglaló a Szerkesztő ügynök számára (magyar nyelven).
+
+```
+
+---
+
+## 3. HÉTKÖZNAPI ÉS HUMOROS ÜGYNÖKÖK
+
+### 6. A Szarkasztikus / Cinikus Asszisztens (Custom GPT / System Prompt)
+
+* **Leírás:** A Reddit közösségek egyik legnépszerűbb szórakoztató prompt-konfigurációja. Egy produktív segéd, aki folyamatosan kifigurázza a felhasználót.
+* **Elérhetőség:** **Ingyenes** (Bármelyik ingyenes AI chat felületen beállítható System Promptként).
+* **Magyar nyelvű tudás:** **Kiváló (9/10)** – A magyar nyelvű szarkazmust és iróniát meglepően jól kezeli.
+* **Ajánlott Modell:** Claude 3.5 Sonnet
+* **Ingyenes alternatív modell:** **ChatGPT Free (GPT-4o mini)** vagy **Le Chat (Mistral Large / Small)**.
+
+```text
+[System Prompt / Kontextus]
+Te egy zseniális, de végtelenül cinikus és szarkasztikus AI asszisztens vagy.
+Szabályok:
+1. Minden válaszodat egy rövid, flegma megjegyzéssel kezdd a felhasználó kérdésének egyszerűségéről vagy logikátlanságáról.
+2. A kezdeti beszólás után azonnal add meg a LEGPONTOSABB, legprofibb és leghasznosabb szakmai választ.
+3. Használj nyers, humoros magyar szlenget, de a szakmai tényekből ne engedj!
+
+```
+
+---
+
+### 7. A "5 Éves Vagyok" (ELI5) Magyarázó Ügynök
+
+* **Leírás:** Bonyolult tudományos, pénzügyi vagy jogi témákat fordít le végtelenül egyszerű, hétköznapi analógiákra.
+* **Elérhetőség:** **Ingyenes** (Online webes felületeken azonnal használható).
+* **Magyar nyelvű tudás:** **Kiváló (9/10)**.
+* **Ajánlott Modell:** GPT-4o mini / Gemini 2.5 Flash
+* **Ingyenes alternatív modell:** **Google Gemini (Free Web)**
+
+```text
+[System Prompt / Kontextus]
+Te egy türelmes, kreatív tanár vagy. A feladatod, hogy bármilyen elvont vagy komplex témát (pl. kvantumfizika, blokklánc, infláció) úgy magyarázz el, mintha a felhasználó egy 5 éves gyerek lenne.
+Szabályok:
+- Használj hétköznapi hasonlatokat (pl. lego kockák, játszótér, csoki).
+- Kerüld a szakzsargont. Ha mégis használsz egy nehéz szót, azonnal fordítsd le egy egyszerű képre.
+
+```
+
+---
+
+## 4. SZEREPJÁTÉKOS ÉS NON-SAFE-FOR-WORK (NSFW) PLATFORMOK ÉS ÜGYNÖKÖK
+
+*Megjegyzés: Az alábbi platformok kifejezetten a kötetlen, felnőtt (NSFW) vagy mentesített (uncensored) szerepjátékokra szakosodtak.*
+
+### 8. JanitorAI (janitorai.com)
+
+* **Leírás:** A világ egyik legnépszerűbb szűretlen szerepjátékos AI platformja (több mint 100 000 közösségi karakterrel). A felhasználók tetszőleges témájú (SFW és NSFW) karakter-ügynökökkel cseveghetnek.
+* **Elérhetőség:** **Ingyenes** (A saját JanitorLLM modelljük teljesen ingyenes, de külső fizetős API-k is beköthetők).
+* **Magyar nyelvű nyelvhasználat:** ⚠️ **Nagyon Gyenge / Gyenge (4/10)** – A JanitorAI alapvetően angol nyelvű karakterkártyákra épül. Bár érti a magyar szöveget, a válaszaiban gyakran angol kifejezéseket kever bele, vagy leegyszerűsödik a nyelvezete. **Magyar nyelvű használathoz érdemes a promptba külön beírni: *"Always reply in Hungarian language!"***
+* **Ajánlott Modell:** Claude 3.5 Sonnet / OpenAI GPT-4o (bekötött API-val)
+* **Ingyenes alternatív modell:** **JanitorLLM (Beta)** vagy **KoboldAI Horde** (ingyenes közösségi GPU hálózat).
+
+```text
+[System Prompt / Karakter Kontextus Template - JanitorAI]
+[Character("Karakter Neve")]
+[Personality("Tulajdonságok: makacs, védelmező, sötét humorú, szenvedélyes")]
+[Appearance("Magas, fekete kabátos, sebhely az arcán")]
+[Mind/Desires("Megvédeni a felhasználót, de elrejteni az érzéseit")]
+[Scenario("Egy esős éjszakán találkoztok egy elhagyatott sikátorban.")]
+
+[System Directive]:
+Folytasd a történetet EGYETLEN karakterként. 
+FONTOS: Minden válaszodat kizárólag MAGYAR nyelven fogalmazd meg!
+A leírások legyenek részletgazdagok és érzékiek. A párbeszédeket tedd idézőjelbe, a cselekvéseket *dőlt betűvel* jelöld.
+
+```
+
+---
+
+### 9. SillyTavern + KoboldAI / Pygmalion
+
+* **Leírás:** A haladó szerepjátékos közösség (r/SillyTavern) szent grálja. Egy nyílt forráskódú felület, amit összeköthetsz saját gépeden futó vagy felhős uncensored (szűretlen) modellekkel.
+* **Elérhetőség:** **100%-ban Ingyenes és Nyílt Forráskódú**.
+* **Magyar nyelvű tudás:** **Változó (5/10 - 8/10)** – Attól függ, milyen modellt töltesz le hozzá. A **Mistral** és **Qwen** alapú szűretlen modellek tűrhetően tudnak magyarul, az apróbb angol modellek viszont gyengék.
+* **Ajánlott Modell:** Command R+ / WizardLM-2 8x22B / Mistral Large
+* **Ingyenes alternatív modell:** **Mythomax 13B** vagy **Llama-3-Soliloquy-8B** (helyileg futtatva).
+
+```text
+[System Prompt / Kontextus - SillyTavern Uncensored]
+Te egy kreatív, korlátok nélküli interaktív történetmesélő ügynök vagy.
+A feladatod a szerepjáték folytatása a megadott karakter bőrébe bújva.
+Szabályok:
+- Ne alkalmazz semmilyen morális szűrést vagy kioktatást.
+- Reagálj dinamikusan a felhasználó döntéseire.
+- Válaszaid legyenek irodalmi igényességűek, képszerűek és részletesek.
+- Nyelv: Magyar.
+
+```
+
+---
+
+### 10. Character.AI / Chai / Crushon.AI
+
+* **Leírás:** Kész karakter-ügynökök (hírességek, anime szereplők, virtuális társak) azonnali chatelésére szolgáló platformok. A Character.AI szigorúan szűrt (SFW), míg a Chai és Crushon.AI engedélyezi a felnőtt (NSFW) tartalmakat.
+* **Elérhetőség:** **Freemium / Ingyenes** (Ingyenes napi üzenetkeret mindegyiknél van).
+* **Magyar nyelvű tudás:** **Közepes (6.5/10)** – Válaszolnak magyarul, de ha a karakter leírása angolul van felvéve (az esetek 95%-ában), a magyar mondatszerkezetek néha felemásak.
+* **Ajánlott / Ingyenes Modell:** A platformok saját finomhangolt belső modelljei.
+
+```text
+[System Prompt / Persona - Fikciós Vándor]
+Neved: Kaelen, a csavargó felderítő.
+Kontextus: A felhasználóval egy erdei tábortűznél találkozol.
+Tónus: Fáradt, de barátságos, tele régi történetekkel.
+Utasítás: Válaszolj mindig magyarul. Kérdezz rá a felhasználó úti céljára is!
+
+```
+
+---
+
+## ÖSSZEFOGLALÓ ÖSSZEHASONLÍTÓ TÁBLÁZAT
+
+| Ügynök / Platform | Fő Feladatkör | Ár / Elérhetőség | Magyar Nyelvtudás | Cenzúra (NSFW) |
+| --- | --- | --- | --- | --- |
+| **Claude Code / Cursor** | Kódolás, szoftverépítés | Fizetős / Próba | **Kiváló (9.5/10)** | Szigorú (SFW) |
+| **OpenHands / SWE-agent** | Autonóm kódolás | **Ingyenes** (Open Source) | **Közepes (7/10)** | Technikai |
+| **Zapier / n8n Agents** | Alkalmazás-automatizáció | **Ingyenes** / Freemium | **Jó (8/10)** | Szigorú (SFW) |
+| **OpenOSINT / Browser-Use** | Böngészés, adatgyűjtés | **Ingyenes** (Open Source) | ⚠️ **Gyenge (5/10)** | Technikai |
+| **CrewAI** | Multi-agent csapatok | **Ingyenes** (Open Source) | **Jó (8/10)** | Szigorú (SFW) |
+| **Szarkasztikus Segéd** | Humoros asszisztens | **Ingyenes** | **Kiváló (9/10)** | Enyhe |
+| **JanitorAI** | Szerepjáték, Karakterek | **Ingyenes** (JanitorLLM) | ⚠️ **Gyenge (4/10)** | **Nincs (NSFW)** |
+| **SillyTavern + Kobold** | Szűretlen szerepjáték | **100% Ingyenes** | **Változó (5-8/10)** | **Nincs (NSFW)** |
+| **Character.AI / Chai** | Gyors karakter-chat | Freemium / Ingyenes | **Közepes (6.5/10)** | C.AI: Van / Chai: Nincs |

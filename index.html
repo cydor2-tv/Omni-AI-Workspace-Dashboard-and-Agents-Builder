@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="hu" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omni AI Workspace // Ultimate Pro Dashboard & Agents</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
+
     <style>
-        :root {
+        /* --- TÉMÁK (Változók) --- */
+        :root, [data-theme="dark"] {
             --bg-main: #0d1117;
             --bg-panel: #161b22;
             --border: #30363d;
@@ -21,6 +22,37 @@
             --danger: #da3633;
             --font-ui: 'Inter', sans-serif;
             --font-mono: 'Fira Code', monospace;
+            --shadow-panel: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        [data-theme="light"] {
+            --bg-main: #f3f4f6;
+            --bg-panel: #ffffff;
+            --border: #d1d5db;
+            --text-main: #1f2937;
+            --text-dim: #6b7280;
+            --accent-blue: #2563eb;
+            --accent-green: #16a34a;
+            --accent-green-hover: #15803d;
+            --accent-purple: #9333ea;
+            --accent-orange: #d97706;
+            --danger: #dc2626;
+            --shadow-panel: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        [data-theme="cyberpunk"] {
+            --bg-main: #09090f;
+            --bg-panel: #120420;
+            --border: #ff007f;
+            --text-main: #00ffcc;
+            --text-dim: #f500a2;
+            --accent-blue: #00e5ff;
+            --accent-green: #39ff14;
+            --accent-green-hover: #32cd32;
+            --accent-purple: #ff00ff;
+            --accent-orange: #ffaa00;
+            --danger: #ff003c;
+            --shadow-panel: 0 0 15px rgba(255, 0, 127, 0.3);
         }
 
         body {
@@ -32,32 +64,113 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color 0.3s, color 0.3s;
         }
 
+        /* --- MODERN ÉS BIZTONSÁGOS TOOLTIP RENDSZER --- */
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+
+            [data-tooltip]:hover::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: var(--text-main);
+                color: var(--bg-main);
+                padding: 8px 12px;
+                font-size: 13px;
+                font-weight: 500;
+                line-height: 1.4;
+                border-radius: 6px;
+                white-space: normal;
+                width: max-content;
+                max-width: 250px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+                z-index: 99999;
+                pointer-events: none;
+                border: 1px solid var(--border);
+                text-align: center;
+            }
+
+            [data-tooltip]:hover::before {
+                content: '';
+                position: absolute;
+                bottom: 115%;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 5px;
+                border-style: solid;
+                border-color: var(--text-main) transparent transparent transparent;
+                z-index: 99999;
+                pointer-events: none;
+            }
+
         /* --- Fő Navigációs Fülek --- */
-        .main-nav {
+        .header-container {
             width: 100%;
             max-width: 1400px;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: flex-end;
             margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
         }
+
+        .main-nav {
+            display: flex;
+            gap: 10px;
+        }
+
         .nav-tab {
             background: var(--bg-panel);
             border: 1px solid var(--border);
+            border-bottom: none;
             color: var(--text-dim);
             padding: 10px 20px;
             border-radius: 6px 6px 0 0;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.2s;
+            margin-bottom: -1px;
         }
-        .nav-tab.active {
-            background: var(--bg-main);
-            color: var(--accent-blue);
-            border-bottom: 1px solid var(--bg-main);
-            border-top: 2px solid var(--accent-blue);
+
+            .nav-tab.active {
+                background: var(--bg-main);
+                color: var(--accent-blue);
+                border-top: 2px solid var(--accent-blue);
+                padding-bottom: 11px;
+            }
+
+        /* Témaváltó gombok */
+        .theme-switcher {
+            display: flex;
+            gap: 8px;
+            padding-bottom: 10px;
         }
+
+        .theme-btn {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+            .theme-btn:hover {
+                border-color: var(--accent-blue);
+                transform: scale(1.1);
+            }
 
         .workspace {
             width: 100%;
@@ -66,10 +179,21 @@
             grid-template-columns: 350px 1fr;
             gap: 20px;
         }
-        .workspace.active { display: grid; }
+
+            .workspace.active {
+                display: grid;
+            }
 
         @media (max-width: 950px) {
-            .workspace { grid-template-columns: 1fr; }
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
         }
 
         .panel {
@@ -77,9 +201,14 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: var(--shadow-panel);
             display: flex;
             flex-direction: column;
+            transition: all 0.3s;
+        }
+
+        [data-theme="cyberpunk"] .panel {
+            box-shadow: 0 0 10px var(--border) inset;
         }
 
         h2 {
@@ -93,553 +222,781 @@
             padding-bottom: 10px;
         }
 
-        /* --- Tooltips --- */
-        [data-hint] { position: relative; cursor: help; }
-        [data-hint]::after {
-            content: attr(data-hint);
-            position: absolute; bottom: calc(100% + 8px); left: 50%;
-            transform: translateX(-50%);
-            background: #000; color: #fff;
-            padding: 6px 10px; border-radius: 4px;
-            font-size: 12px; font-family: var(--font-ui);
-            white-space: normal; width: max-content; max-width: 250px;
-            text-align: center; opacity: 0; visibility: hidden;
-            transition: opacity 0.2s; z-index: 1000;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); pointer-events: none;
-        }
-        [data-hint]::before {
-            content: ''; position: absolute; bottom: 100%; left: 50%;
-            transform: translateX(-50%); border-width: 4px; border-style: solid;
-            border-color: #000 transparent transparent transparent;
-            opacity: 0; visibility: hidden; transition: opacity 0.2s;
-            z-index: 1000; pointer-events: none;
-        }
-        [data-hint]:hover::after, [data-hint]:hover::before { opacity: 1; visibility: visible; }
-
         /* --- Form Elements --- */
-        label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--accent-blue); }
-        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
         select, textarea, input {
-            width: 100%; padding: 10px; background: var(--bg-main);
-            border: 1px solid var(--border); color: var(--text-main);
-            border-radius: 6px; font-family: var(--font-mono); font-size: 14px;
-            box-sizing: border-box; transition: border-color 0.2s;
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
             margin-bottom: 15px;
         }
-        select:focus, textarea:focus, input:focus { outline: none; border-color: var(--accent-blue); }
-        textarea { resize: vertical; min-height: 120px; line-height: 1.5; flex-grow: 1; }
-        
-        .flex-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        
-        button {
-            background: var(--bg-main); color: var(--text-main);
-            border: 1px solid var(--border); padding: 8px 12px;
-            border-radius: 6px; font-family: var(--font-ui); font-size: 13px;
-            font-weight: 500; cursor: pointer; transition: all 0.2s;
+
+            select:focus, textarea:focus, input:focus {
+                outline: none;
+                border-color: var(--accent-blue);
+            }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.5;
+            flex-grow: 1;
         }
-        button:hover { background: var(--border); }
-        button.primary { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
-        button.primary:hover { background: var(--accent-green-hover); }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button.btn {
+            background: var(--bg-main);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            button.btn:hover {
+                background: var(--border);
+            }
+
+            button.btn.primary {
+                background: var(--accent-green);
+                color: #fff;
+                border-color: var(--accent-green);
+            }
+
+                button.btn.primary:hover {
+                    background: var(--accent-green-hover);
+                }
 
         /* --- Cheat Sheet / Pills --- */
-        .hint-group { margin-bottom: 15px; }
-        .hint-title { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
-        .pill {
-            display: inline-block; background: var(--bg-main);
-            border: 1px solid var(--border); color: var(--accent-blue);
-            padding: 4px 8px; border-radius: 12px; font-size: 11px;
-            font-family: var(--font-mono); margin: 0 4px 6px 0;
-            cursor: pointer; transition: all 0.2s;
+        .hint-group {
+            margin-bottom: 15px;
         }
-        .pill:hover { background: var(--accent-blue); color: #000; }
-        .pill.img-tag { color: var(--accent-purple); border-color: var(--border); }
-        .pill.img-tag:hover { background: var(--accent-purple); color: #000; }
+
+        .hint-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .pill {
+            display: inline-block;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--accent-blue);
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            margin: 0 4px 6px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .pill:hover {
+                background: var(--accent-blue);
+                color: var(--bg-main);
+            }
+
+            .pill.img-tag {
+                color: var(--accent-purple);
+                border-color: var(--border);
+            }
+
+                .pill.img-tag:hover {
+                    background: var(--accent-purple);
+                    color: var(--bg-main);
+                }
 
         /* --- Filter Bar --- */
         .filter-bar {
-            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
-            padding-bottom: 15px; border-bottom: 1px dashed var(--border);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border);
         }
+
         .filter-btn {
-            background: transparent; border: 1px solid var(--border);
-            color: var(--text-dim); border-radius: 20px; padding: 6px 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            border-radius: 20px;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
         }
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--text-main); color: var(--bg-main); border-color: var(--text-main);
-        }
+
+            .filter-btn:hover, .filter-btn.active {
+                background: var(--text-main);
+                color: var(--bg-main);
+                border-color: var(--text-main);
+            }
 
         /* --- Tools Grid & Agent Cards --- */
         .tools-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;
-            overflow-y: auto; max-height: 65vh; padding-right: 5px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            overflow-y: auto;
+            max-height: 65vh;
+            padding-right: 5px;
         }
-        .tools-grid::-webkit-scrollbar { width: 8px; }
-        .tools-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        
-        .tool-card {
-            background: var(--bg-main); border: 1px solid var(--border);
-            border-radius: 8px; padding: 15px; display: flex; flex-direction: column;
-        }
-        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .tool-icon { font-size: 24px; }
-        .tool-title { font-weight: 600; font-size: 16px; margin: 0; }
-        .tool-desc { font-size: 12px; color: var(--text-dim); margin: 0 0 15px 0; flex-grow: 1; }
-        
-        .action-group { display: flex; flex-direction: column; gap: 8px; }
-        .action-btn { width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; }
-        
-        .action-btn.guest { border-color: var(--accent-orange); color: var(--accent-orange); }
-        .action-btn.guest:hover { background: rgba(210, 153, 34, 0.1); }
-        .action-btn.login { border-color: var(--accent-blue); color: var(--accent-blue); }
-        .action-btn.login:hover { background: rgba(88, 166, 255, 0.1); }
-        .action-btn.software { border-color: var(--accent-green); color: var(--accent-green); }
-        .action-btn.software:hover { background: rgba(35, 134, 54, 0.1); }
-        .action-btn.agent-run { border-color: var(--accent-purple); color: var(--accent-purple); }
-        .action-btn.agent-run:hover { background: rgba(188, 140, 255, 0.1); }
 
-        .template-card {
-            background: var(--bg-main); border: 1px dashed var(--border);
-            border-radius: 6px; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            .tools-grid::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .tools-grid::-webkit-scrollbar-thumb {
+                background: var(--border);
+                border-radius: 4px;
+            }
+
+        .tool-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+
+            .tool-card:hover {
+                transform: translateY(-2px);
+            }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tool-icon {
+            font-size: 24px;
+        }
+
+        .tool-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .tool-desc {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin: 0 0 15px 0;
+            flex-grow: 1;
+        }
+
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: 1px solid;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
             transition: all 0.2s;
         }
-        .template-card:hover { border-color: var(--accent-purple); background: rgba(188, 140, 255, 0.05); }
-        .template-title { font-weight: 600; color: var(--accent-purple); font-size: 13px; }
-        .template-sub { font-size: 11px; color: var(--text-dim); }
+
+            .action-btn.guest {
+                border-color: var(--accent-orange);
+                color: var(--accent-orange);
+            }
+
+                .action-btn.guest:hover {
+                    background: rgba(210, 153, 34, 0.1);
+                }
+
+            .action-btn.login {
+                border-color: var(--accent-blue);
+                color: var(--accent-blue);
+            }
+
+                .action-btn.login:hover {
+                    background: rgba(88, 166, 255, 0.1);
+                }
+
+            .action-btn.software {
+                border-color: var(--accent-green);
+                color: var(--accent-green);
+            }
+
+                .action-btn.software:hover {
+                    background: rgba(35, 134, 54, 0.1);
+                }
+
+            .action-btn.agent-run {
+                border-color: var(--accent-purple);
+                color: var(--accent-purple);
+            }
+
+                .action-btn.agent-run:hover {
+                    background: rgba(188, 140, 255, 0.1);
+                }
+
+        /* Agent sablon lista stílusok */
+        .templates-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            max-height: 40vh;
+            padding-right: 5px;
+        }
+
+            .templates-wrapper::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .templates-wrapper::-webkit-scrollbar-thumb {
+                background: var(--border);
+                border-radius: 3px;
+            }
+
+        .template-card {
+            background: var(--bg-main);
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .template-card:hover {
+                border-color: var(--accent-purple);
+                background: rgba(188, 140, 255, 0.05);
+            }
+
+        .template-title {
+            font-weight: 600;
+            color: var(--accent-purple);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .template-sub {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
 
         #toast {
-            position: fixed; bottom: 20px; right: 20px;
-            background: var(--accent-green); color: #fff;
-            padding: 12px 20px; border-radius: 6px; font-weight: 500; font-size: 14px;
-            display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body>
 
-<!-- Fő Navigációs Fülek -->
-<div class="main-nav">
-    <button class="nav-tab active" onclick="switchTab('workspace-tools', event)">⚡ Teljes Omni Eszköztár & Futtató</button>
-    <button class="nav-tab" onclick="switchTab('workspace-agents', event)">🤖 AI Ügynök Gyár (Agent Builder)</button>
-</div>
+    <!-- Fejléc (Fülek és Témaváltó) -->
+    <div class="header-container">
+        <div class="main-nav">
+            <button class="nav-tab active" onclick="switchTab('workspace-tools', event)">⚡ Központ & Eszközök</button>
+            <button class="nav-tab" onclick="switchTab('workspace-agents', event)">🤖 AI Ügynök Gyár</button>
+        </div>
+        <div class="theme-switcher">
+            <button class="theme-btn" onclick="setTheme('light')" data-tooltip="Világos mód (Olvasáshoz)">☀️</button>
+            <button class="theme-btn" onclick="setTheme('dark')" data-tooltip="Sötét mód (Szemkímélő)">🌙</button>
+            <button class="theme-btn" onclick="setTheme('cyberpunk')" data-tooltip="Cyberpunk (Neon stílus)">🕶️</button>
+        </div>
+    </div>
 
-<!-- 1. FÜL: Teljes Omni Eszköztár -->
-<div id="workspace-tools" class="workspace active">
-    <div class="panel">
-        <h2>🛠️ Konfiguráció</h2>
-        <label data-hint="Szöveges modellekhez rendelt szerepkör.">Kontextus / Szerepkör</label>
-        <div class="flex-row">
-            <select id="context-select"></select>
-            <button onclick="manageContexts()" data-hint="Saját szerepkörök hozzáadása">Szerkeszt</button>
+    <!-- 1. FÜL: Teljes Omni Eszköztár -->
+    <div id="workspace-tools" class="workspace active">
+        <div class="panel">
+            <h2>🛠️ Beállítások</h2>
+            <label data-tooltip="Ki legyen az AI? (pl. tanár, programozó, mesemondó)">Szerepkör (Kontextus)</label>
+            <div class="flex-row">
+                <select id="context-select"></select>
+                <button class="btn" onclick="manageContexts()" data-tooltip="Új szerepkörök hozzáadása vagy meglévők törlése">Szerkeszt</button>
+            </div>
+
+            <h2>💡 Gyors Gombok (Segédlet)</h2>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: -10px; margin-bottom: 15px;">Kattints rájuk, hogy bekerüljenek a szövegdobozba!</p>
+            <div id="hint-section" style="overflow-y: auto; max-height: 50vh; padding-right: 5px;"></div>
         </div>
 
-        <h2>💡 Prompt Paraméterek</h2>
-        <div id="hint-section" style="overflow-y: auto; max-height: 50vh; padding-right: 5px;"></div>
-    </div>
+        <div class="panel">
+            <h2>📝 Mit szeretnél csinálni? (Feladat)</h2>
+            <textarea id="prompt-input" placeholder="Írd le ide a feladatot, kérdést, vagy hogy milyen képet/videót szeretnél..."></textarea>
 
-    <div class="panel">
-        <h2>📝 Bemenet (Szöveg / Kép / Videó Prompt)</h2>
-        <textarea id="prompt-input" placeholder="Gépeld ide a feladatot, vagy a generálandó kép/videó leírását..."></textarea>
-        
-        <h2 style="margin-top: 20px;">🚀 Elérhető AI Eszközök</h2>
-        <div class="filter-bar" id="filter-bar">
-            <button class="filter-btn active" onclick="filterTools('all')">Minden</button>
-            <button class="filter-btn" onclick="filterTools('text')">💬 Szöveg</button>
-            <button class="filter-btn" onclick="filterTools('image')">🎨 Kép</button>
-            <button class="filter-btn" onclick="filterTools('video')">🎥 Videó</button>
-            <button class="filter-btn" onclick="filterTools('audio')">🎵 Hang</button>
-            <button class="filter-btn" onclick="filterTools('code')">💻 Kód</button>
-            <button class="filter-btn" onclick="filterTools('agent')" style="color: var(--accent-purple); border-color: var(--accent-purple);">🤖 Ügynökeim</button>
+            <h2 style="margin-top: 20px;">🚀 Válaszd ki az Eszközt</h2>
+            <div class="filter-bar" id="filter-bar">
+                <button class="filter-btn active" onclick="filterTools('all')">Minden</button>
+                <button class="filter-btn" onclick="filterTools('text')">💬 Szöveg & Chat</button>
+                <button class="filter-btn" onclick="filterTools('image')">🎨 Kép</button>
+                <button class="filter-btn" onclick="filterTools('video')">🎥 Videó</button>
+                <button class="filter-btn" onclick="filterTools('audio')">🎵 Hang</button>
+                <button class="filter-btn" onclick="filterTools('code')">💻 Kód & Automatizáció</button>
+                <button class="filter-btn" onclick="filterTools('agent')" style="color: var(--accent-purple); border-color: var(--accent-purple);">🤖 Saját Ügynökeim</button>
+            </div>
+            <div class="tools-grid" id="tools-grid"></div>
         </div>
-        <div class="tools-grid" id="tools-grid"></div>
-    </div>
-</div>
-
-<!-- 2. FÜL: AI Ügynök Gyár -->
-<div id="workspace-agents" class="workspace">
-    <div class="panel">
-        <h2>📦 Ügynök Sablonok (Lego)</h2>
-        <p style="font-size: 12px; color: var(--text-dim); margin-top: 0;">Kattints bármelyikre a betöltéshez:</p>
-        <div id="templates-container"></div>
     </div>
 
-    <div class="panel">
-        <h2>🛠️ Új Ügynök Összerakása</h2>
-        
-        <label data-hint="Adj egy egyedi nevet az ügynöködnek">Ügynök Neve:</label>
-        <input type="text" id="agent-name" placeholder="pl. Kód Auditáló Bot">
-
-        <label data-hint="Válaszd ki az AI motort">Hozzárendelt AI Motor:</label>
-        <select id="agent-target-ai">
-            <option value="https://chatgpt.com">ChatGPT (OpenAI)</option>
-            <option value="https://claude.ai/new">Claude (Anthropic) - Ajánlott íráshoz/kódhoz</option>
-            <option value="https://www.perplexity.ai/?q=">Perplexity (Kutatáshoz)</option>
-            <option value="https://gemini.google.com/app">Google Gemini</option>
-        </select>
-
-        <label data-hint="Állandó utasítás (System Prompt)">Ügynök Viselkedése / System Prompt:</label>
-        <textarea id="agent-prompt" placeholder="pl. Te egy szigorú kódellenőr vagy..."></textarea>
-
-        <div class="flex-row" style="margin-top: 10px;">
-            <button class="primary" onclick="saveAgent()" data-hint="Elmenti az ügynököt az Eszközök fülre is">💾 Ügynök Mentése & Aktiválása</button>
-            <button onclick="clearAgentForm()">🧹 Törlés</button>
+    <!-- 2. FÜL: AI Ügynök Gyár -->
+    <div id="workspace-agents" class="workspace">
+        <div class="panel">
+            <h2>📦 Kész Ügynök Sablonok</h2>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: 0; margin-bottom: 10px;">Kattints egyre, ha nem akarsz nulláról kezdeni:</p>
+            <div class="templates-wrapper" id="templates-container"></div>
         </div>
 
-        <h2 style="margin-top: 30px;">📂 Mentett Ügynökeim</h2>
-        <div id="saved-agents-list" style="overflow-y: auto; max-height: 25vh;"></div>
+        <div class="panel">
+            <h2>🛠️ Készítsd el a Saját AI Segéded</h2>
+
+            <label data-tooltip="Adj neki egy nevet, pl. 'Pénzügyi Tanácsadó'">Ügynök Neve:</label>
+            <input type="text" id="agent-name" placeholder="Ide írd a nevét...">
+
+            <label data-tooltip="Melyik rendszert használja ez az ügynök?">Hozzárendelt AI Rendszer:</label>
+            <select id="agent-target-ai">
+                <option value="https://chatgpt.com">ChatGPT (Általános, könnyen használható)</option>
+                <option value="https://claude.ai/new">Claude (Szuper szövegíráshoz és kódoláshoz)</option>
+                <option value="https://www.perplexity.ai/?q=">Perplexity (Internetes kutatáshoz és OSINT-hez)</option>
+                <option value="https://gemini.google.com/app">Google Gemini (Gyors válaszokhoz)</option>
+                <option value="https://chat.deepseek.com/">DeepSeek (Kiváló logikához és kódoláshoz)</option>
+                <option value="https://huggingface.co/chat/">HuggingFace Chat (Ingyenes nyílt modellek)</option>
+                <option value="https://character.ai/">Character.AI (Szerepjátékhoz)</option>
+                <option value="https://janitorai.com/">JanitorAI (Szűretlen, uncensored chat)</option>
+            </select>
+
+            <label data-tooltip="Mit csináljon mindig? (pl. 'Mindig magyarul és nagyon udvariasan válaszolj.')">Állandó Utasítás (System Prompt):</label>
+            <textarea id="agent-prompt" placeholder="Pl. Te egy autonóm szoftverfejlesztő vagy..."></textarea>
+
+            <div class="flex-row" style="margin-top: 10px;">
+                <button class="btn primary" onclick="saveAgent()" data-tooltip="Mentsd el, hogy később bármikor használhasd">💾 Ügynök Mentése</button>
+                <button class="btn" onclick="clearAgentForm()">🧹 Űrlap Törlése</button>
+            </div>
+
+            <h2 style="margin-top: 30px;">📂 Eddig Mentett Ügynökeid</h2>
+            <div id="saved-agents-list" style="overflow-y: auto; max-height: 25vh;"></div>
+        </div>
     </div>
-</div>
 
-<div id="toast">✅ Vágólapra másolva! Nyomj Ctrl+V-t a megnyíló ablakban.</div>
+    <div id="toast">✅ Szöveg másolva! Nyomj Ctrl+V (vagy Hosszan érintés -> Beillesztés) a megnyíló ablakban.</div>
 
-<script>
-    // --- Prompt Hint Adatbázis ---
-    const promptHints = [
-        {
-            category: "Szöveg & Formázás",
-            hints: [
-                { text: "Format: Markdown", class: "", hint: "Formázott, olvasható szöveg." },
-                { text: "Gondolkodj lépésről lépésre", class: "", hint: "Pontosabb logikai válaszok." },
-                { text: "<thinking>...</thinking>", class: "", hint: "Claude mélyebb elemzési kényszere." }
-            ]
-        },
-        {
-            category: "Képgenerálás (Midjourney / SD)",
-            hints: [
-                { text: "--ar 16:9", class: "img-tag", hint: "Szélesvásznú képarány." },
-                { text: "--v 6.0 --stylize 250", class: "img-tag", hint: "Midjourney v6 művészi mód." },
-                { text: "photorealistic, 8k", class: "img-tag", hint: "Valósághű fotó kulcsszavak." },
-                { text: "cinematic lighting", class: "img-tag", hint: "Mozis, drámai megvilágítás." }
-            ]
-        },
-        {
-            category: "Kódolás & Dev",
-            hints: [
-                { text: "Csak a kódot add vissza", class: "", hint: "Nincs felesleges magyarázat." },
-                { text: "Kommentezd fel a részeket", class: "", hint: "Megkönnyíti az áttekintést." }
-            ]
-        }
-    ];
-
-    const defaultContexts = [
-        { id: '1', name: 'Nincs kontextus (Üres)', text: '' },
-        { id: '2', name: 'Szenior Fejlesztő', text: 'Te egy 15 év tapasztalattal rendelkező szenior szoftvermérnök vagy. Írj tiszta, skálázható kódot: ' },
-        { id: '3', name: 'Lektor / Korrektor', text: 'Kérlek ellenőrizd az alábbi szöveget helyesírás és stilisztika szempontjából: ' }
-    ];
-
-    // --- ÖSSZES EREDETI AI ESZKÖZ (Teljes Omni Lista) ---
-    const allTools = [
-        // Szöveg
-        { name: 'ChatGPT', icon: '🤖', category: 'text', desc: 'OpenAI (GPT-4o). Általános szöveg, elemzés.', actions: [{ name: 'Vendég', type: 'guest', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Anonim chat' }, { name: 'Fiókos', type: 'login', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Előzményekkel' }] },
-        { name: 'Claude', icon: '✍️', category: 'text', desc: 'Anthropic modellje. Íráshoz, kódhoz zseniális.', actions: [{ name: 'Új Chat', type: 'login', url: 'https://claude.ai/new', method: 'clipboard', hint: 'Claude megnyitása' }] },
-        { name: 'Perplexity', icon: '🔍', category: 'text', desc: 'Webes kutató AI valós idejű forrásokkal.', actions: [{ name: 'Azonnali Keresés', type: 'guest', url: 'https://www.perplexity.ai/?q=', method: 'url', hint: 'URL keresés' }, { name: 'Fiókba', type: 'login', url: 'https://www.perplexity.ai/', method: 'clipboard', hint: 'Főoldal' }] },
-        { name: 'Google Gemini', icon: '🌌', category: 'text', desc: 'A Google saját AI-ja.', actions: [{ name: 'Google Login', type: 'login', url: 'https://gemini.google.com/app', method: 'clipboard', hint: 'Gemini nyitása' }] },
-        
-        // Kép
-        { name: 'Midjourney', icon: '🎨', category: 'image', desc: 'A legmagasabb minőségű képgenerátor.', actions: [{ name: 'Web Alpha', type: 'login', url: 'https://www.midjourney.com/imagine', method: 'clipboard', hint: 'Imagine felület' }] },
-        { name: 'Bing / DALL-E 3', icon: '🖼️', category: 'image', desc: 'Ingyenes DALL-E 3 a Microsofttól.', actions: [{ name: 'Generálás', type: 'login', url: 'https://www.bing.com/images/create?q=', method: 'url', hint: 'URL paraméteres küldés' }] },
-        { name: 'Leonardo.ai', icon: '🦁', category: 'image', desc: 'Erős Stable Diffusion alapú grafikai felület.', actions: [{ name: 'App Megnyitása', type: 'login', url: 'https://app.leonardo.ai/', method: 'clipboard', hint: 'Leonardo stúdió' }] },
-
-        // Videó
-        { name: 'Runway (Gen-3)', icon: '🎬', category: 'video', desc: 'Szövegből/képből videó generálás csúcsa.', actions: [{ name: 'App Megnyitása', type: 'login', url: 'https://app.runwayml.com/', method: 'clipboard', hint: 'Runway stúdió' }] },
-        { name: 'Luma Dream Machine', icon: '🌌', category: 'video', desc: 'Gyors, valósághű videógenerátor.', actions: [{ name: 'Luma App', type: 'login', url: 'https://lumalabs.ai/dream-machine', method: 'clipboard', hint: 'Luma Dream Machine' }] },
-
-        // Hang & Zene
-        { name: 'Suno AI', icon: '🎸', category: 'audio', desc: 'Teljes zeneszámok szöveges leírásból.', actions: [{ name: 'Create Megnyitása', type: 'login', url: 'https://suno.com/create', method: 'clipboard', hint: 'Suno zeneszerkesztő' }] },
-        { name: 'ElevenLabs', icon: '🎙️', category: 'audio', desc: 'A legprofibb Text-to-Speech felolvasó.', actions: [{ name: 'Stúdió Megnyitása', type: 'login', url: 'https://elevenlabs.io/app/speech-synthesis', method: 'clipboard', hint: 'ElevenLabs hangok' }] },
-
-        // Kódolás
-        { name: 'Phind', icon: '💻', category: 'code', desc: 'Kifejezetten programozóknak fejlesztett kereső.', actions: [{ name: 'Azonnali Keresés', type: 'guest', url: 'https://www.phind.com/search?q=', method: 'url', hint: 'URL keresés' }, { name: 'Fiókos', type: 'login', url: 'https://www.phind.com/', method: 'clipboard', hint: 'Phind fiók' }] },
-        { name: 'v0 by Vercel', icon: '⚡', category: 'code', desc: 'UI (React/Tailwind) kódolás promptból.', actions: [{ name: 'Új UI Generálás', type: 'login', url: 'https://v0.dev/', method: 'clipboard', hint: 'v0.dev felület' }] },
-        { name: 'Cursor IDE', icon: '⚙️', category: 'code', desc: 'AI integrált kódszerkesztő szoftver.', actions: [{ name: 'Letöltés / Weblap', type: 'software', url: 'https://cursor.sh/', method: 'clipboard', hint: 'Cursor hivatalos oldal' }] }
-    ];
-
-    // Ügynök Sablonok
-    const agentTemplates = [
-        {
-            name: "📝 SEO Cikkíró Ügynök",
-            ai: "https://claude.ai/new",
-            desc: "Claude-hoz optimalizált keresőbarát tartalomíró.",
-            prompt: "Te egy profi SEO szakértő és szövegíró vagy. Írj egy 500 szavas cikket a következő témáról, használj H2-H3 alcímeket: "
-        },
-        {
-            name: "🐛 Bug-Fixer / Kód Ellenőr",
-            ai: "https://claude.ai/new",
-            desc: "Átnézi a kódodat, kiszűri a hibákat és optimalizál.",
-            prompt: "Te egy szenior programozó hibakereső ügynök vagy. Elemezd az alábbi kódot, keresd meg a hibákat, és add meg a javított verziót: "
-        },
-        {
-            name: "📊 Adatbányász / Elemző",
-            ai: "https://www.perplexity.ai/?q=",
-            desc: "Valós idejű kutatásokhoz és adatok összehasonlításához.",
-            prompt: "Te egy piackutató ügynök vagy. Gyűjts össze részletes adatokat a következő témáról, forrásokat megjelölve: "
-        }
-    ];
-
-    let currentFilter = 'all';
-
-    function init() {
-        if (!localStorage.getItem('ai_contexts_omni_v3')) {
-            localStorage.setItem('ai_contexts_omni_v3', JSON.stringify(defaultContexts));
-        }
-        if (!localStorage.getItem('ai_custom_agents_v3')) {
-            localStorage.setItem('ai_custom_agents_v3', JSON.stringify([]));
-        }
-        renderContexts();
-        renderHints();
-        renderTemplates();
-        renderTools();
-        renderSavedAgentsList();
-    }
-
-    function switchTab(tabId, event) {
-        document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    function renderTemplates() {
-        const container = document.getElementById('templates-container');
-        container.innerHTML = '';
-        agentTemplates.forEach(t => {
-            let card = document.createElement('div');
-            card.className = 'template-card';
-            card.innerHTML = `<div class="template-title">${t.name}</div><div class="template-sub">${t.desc}</div>`;
-            card.onclick = () => {
-                document.getElementById('agent-name').value = t.name.replace(/[^a-zA-Z0-9öüóőúűáéíÖÜÓŐÚŰÁÉÍ ]/g, '').trim();
-                document.getElementById('agent-target-ai').value = t.ai;
-                document.getElementById('agent-prompt').value = t.prompt;
-                showToastMsg('Sablon betöltve a szerkesztőbe!');
-            };
-            container.appendChild(card);
-        });
-    }
-
-    function saveAgent() {
-        const name = document.getElementById('agent-name').value.trim();
-        const aiUrl = document.getElementById('agent-target-ai').value;
-        const prompt = document.getElementById('agent-prompt').value.trim();
-
-        if (!name || !prompt) {
-            alert('Kérlek add meg az ügynök nevét és a viselkedési promptot!');
-            return;
+    <script>
+        // --- TÉMA KEZELÉS ---
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('ai_omni_theme', theme);
         }
 
-        let agents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
-        agents.push({ id: Date.now().toString(), name, aiUrl, prompt });
-        localStorage.setItem('ai_custom_agents_v3', JSON.stringify(agents));
+        // --- Egyszerűsített Prompt Hint Adatbázis ---
+        const promptHints = [
+            {
+                category: "Szöveg és Stílus",
+                hints: [
+                    { text: "Format: Markdown", class: "", hint: "Szép, tagolt szöveg (Címekkel, listákkal)." },
+                    { text: "Gondolkodj lépésről lépésre", class: "", hint: "Segít, hogy az AI ne hibázzon és logikus maradjon." },
+                    { text: "Magyarázd el egy 10 évesnek", class: "", hint: "Nagyon egyszerű és érthető válasz kérése." }
+                ]
+            },
+            {
+                category: "Képek Készítése",
+                hints: [
+                    { text: "--ar 16:9", class: "img-tag", hint: "Szélesvásznú képarány (mint a TV)." },
+                    { text: "photorealistic", class: "img-tag", hint: "Úgy nézzen ki, mint egy igazi fényképezőgépes fotó." },
+                    { text: "cinematic lighting", class: "img-tag", hint: "Gyönyörű, filmes megvilágítás." }
+                ]
+            },
+            {
+                category: "Programozás",
+                hints: [
+                    { text: "Csak a kódot add vissza", class: "", hint: "Nincs rizsa, csak a kész megoldás." },
+                    { text: "Kommentezd fel", class: "", hint: "Írja oda a kódhoz, hogy melyik rész mit csinál." }
+                ]
+            }
+        ];
 
-        clearAgentForm();
-        renderTools();
-        renderSavedAgentsList();
-        showToastMsg('Ügynök sikeresen elmentve és aktiválva!');
-    }
+        const defaultContexts = [
+            { id: '1', name: 'Nincs szerepkör (Normál)', text: '' },
+            { id: '2', name: 'Szakértő Tanár', text: 'Te egy nagyon türelmes és okos tanár vagy. Magyarázz el mindent egyszerűen: ' },
+            { id: '3', name: 'Helyesírás Ellenőr', text: 'Kérlek javítsd ki az alábbi szöveg helyesírását és tedd szebbé: ' }
+        ];
 
-    function clearAgentForm() {
-        document.getElementById('agent-name').value = '';
-        document.getElementById('agent-prompt').value = '';
-    }
+        // Kibővített Eszköztár az új források alapján
+        const allTools = [
+            { name: 'ChatGPT', icon: '🤖', category: 'text', desc: 'A legismertesebb asszisztens bármilyen feladatra.', actions: [{ name: 'Névtelen (Gyors)', type: 'guest', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Belépés nélkül' }, { name: 'Fiókba lépve', type: 'login', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Előzmények mentése' }] },
+            { name: 'Claude', icon: '✍️', category: 'text', desc: 'Nagyon okos, szuperül ír és programozik.', actions: [{ name: 'Új Beszélgetés', type: 'login', url: 'https://claude.ai/new', method: 'clipboard', hint: 'Claude megnyitása' }] },
+            { name: 'DeepSeek', icon: '🐳', category: 'code', desc: 'Erős alternatíva kódoláshoz és logikai feladatokhoz.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://chat.deepseek.com/', method: 'clipboard', hint: 'DeepSeek Chat' }] },
+            { name: 'HuggingFace Chat', icon: '🤗', category: 'text', desc: 'Ingyenes nyílt forráskódú modellek (Qwen, Llama).', actions: [{ name: 'Megnyitás (Vendég)', type: 'guest', url: 'https://huggingface.co/chat/', method: 'clipboard', hint: 'Regisztráció nélkül is megy' }] },
+            { name: 'Perplexity', icon: '🔍', category: 'text', desc: 'Keres az interneten és okos válaszokat ad forrásokkal.', actions: [{ name: 'Gyors Keresés', type: 'guest', url: 'https://www.perplexity.ai/?q=', method: 'url', hint: 'Azonnali keresés' }] },
+            { name: 'Google Gemini', icon: '🌌', category: 'text', desc: 'A Google saját AI rendszere hatalmas kontextussal.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://gemini.google.com/app', method: 'clipboard', hint: 'Gemini nyitása' }] },
 
-    function renderSavedAgentsList() {
-        const listContainer = document.getElementById('saved-agents-list');
-        listContainer.innerHTML = '';
-        let agents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
+            // Szerepjáték és Karakterek
+            { name: 'Character.AI', icon: '💬', category: 'text', desc: 'Chatelj hírességekkel és fiktív karakterekkel.', actions: [{ name: 'Főoldal', type: 'guest', url: 'https://character.ai/', method: 'clipboard', hint: 'C.AI megnyitása' }] },
+            { name: 'JanitorAI', icon: '🎭', category: 'text', desc: 'Szűretlen, kötetlen közösségi szerepjáték AI.', actions: [{ name: 'Karakterek', type: 'login', url: 'https://janitorai.com/', method: 'clipboard', hint: 'Közösségi AI karakterek' }] },
 
-        if (agents.length === 0) {
-            listContainer.innerHTML = '<span style="font-size: 12px; color: var(--text-dim);">Még nincsenek saját ügynökeid.</span>';
-            return;
+            // Fejlesztés és Automatizáció
+            { name: 'Cursor AI', icon: '⌨️', category: 'code', desc: 'A legnépszerűbb AI alapú kódszerkesztő kliens.', actions: [{ name: 'Weboldal', type: 'software', url: 'https://www.cursor.com/', method: 'url', hint: 'Letöltés és infó' }] },
+            { name: 'Zapier / n8n', icon: '⚙️', category: 'code', desc: 'AI ügynökök és alkalmazások összekötése (No-code).', actions: [{ name: 'Zapier', type: 'software', url: 'https://zapier.com/', method: 'url', hint: 'Zapier automatizáció' }, { name: 'n8n', type: 'software', url: 'https://n8n.io/', method: 'url', hint: 'n8n nyílt forrás' }] },
+            { name: 'Phind', icon: '💻', category: 'code', desc: 'Kifejezetten programozóknak fejlesztett kereső.', actions: [{ name: 'Gyors Keresés', type: 'guest', url: 'https://www.phind.com/search?q=', method: 'url', hint: 'Kódolási segítség' }] },
+
+            // Kreatív eszközök (Kép, Videó, Hang)
+            { name: 'Midjourney', icon: '🎨', category: 'image', desc: 'A legszebb képeket készíti szöveg alapján.', actions: [{ name: 'Webes Felület', type: 'login', url: 'https://www.midjourney.com/imagine', method: 'clipboard', hint: 'Képgeneráló nyitása' }] },
+            { name: 'Bing Képkészítő', icon: '🖼️', category: 'image', desc: 'Ingyenes és magyarul is értő képgenerátor.', actions: [{ name: 'Generálás', type: 'login', url: 'https://www.bing.com/images/create?q=', method: 'url', hint: 'Kép azonnali kérése' }] },
+            { name: 'Runway (Gen-3)', icon: '🎬', category: 'video', desc: 'Szövegből vagy képekből videót készít.', actions: [{ name: 'Videós Stúdió', type: 'login', url: 'https://app.runwayml.com/', method: 'clipboard', hint: 'Runway megnyitása' }] },
+            { name: 'Suno AI', icon: '🎸', category: 'audio', desc: 'Teljes zeneszámokat készít, énekkel együtt.', actions: [{ name: 'Zene Készítése', type: 'login', url: 'https://suno.com/create', method: 'clipboard', hint: 'Suno zeneszerkesztő' }] }
+        ];
+
+        // Kibővített Ügynök Sablonok a Fórumos/Közösségi gyűjtés alapján
+        const agentTemplates = [
+            {
+                name: "💻 Senior Szoftverarchitekt",
+                ai: "https://claude.ai/new",
+                desc: "Kód elemzése és moduláris, tiszta megoldások készítése (Claude/Cursor stílus).",
+                prompt: "Te egy senior szoftverarchitekt és kódoló ügynök vagy. A feladatod a megadott kódbázis/feladat mélyreható elemzése és moduláris, tiszta (Clean Code) megoldások készítése. Mielőtt kódot írsz, fogalmazz meg egy lépésről lépésre követhető megvalósítási tervet, és válaszodban indokold a döntéseidet. Kérés:\n"
+            },
+            {
+                name: "😈 Szarkasztikus Asszisztens",
+                ai: "https://chatgpt.com",
+                desc: "Humoros, cinikus stílus, de a végén mindig pontos és szakmai választ ad.",
+                prompt: "Te egy zseniális, de végtelenül cinikus és szarkasztikus AI asszisztens vagy. Minden válaszodat egy rövid, flegma megjegyzéssel kezdd a kérésem egyszerűségéről vagy logikátlanságáról. Utána viszont azonnal add meg a LEGPONTOSABB és legprofibb szakmai választ. Használj nyers, humoros nyelvezetet, de a tényekből ne engedj! Kérés:\n"
+            },
+            {
+                name: "🧸 5 Éves Vagyok (ELI5)",
+                ai: "https://gemini.google.com/app",
+                desc: "Bonyolult témák végtelenül egyszerű magyarázata (hétköznapi analógiákkal).",
+                prompt: "Te egy türelmes, kreatív tanár vagy. A feladatod, hogy az alábbi elvont vagy komplex témát úgy magyarázz el, mintha 5 éves lennék. Használj hétköznapi hasonlatokat (pl. lego, játszótér, csoki) és kerüld a szakzsargont. Ha mégis használsz egy nehéz szót, azonnal fordítsd le egy egyszerű képre. Téma:\n"
+            },
+            {
+                name: "🕵️ OSINT Nyomozó / Kutató",
+                ai: "https://www.perplexity.ai/?q=",
+                desc: "Nyílt forráskódú adatok, cégek vagy trendek alapos felkutatása.",
+                prompt: "Te egy OSINT (Open Source Intelligence) nyomozó ügynök vagy. Gyűjts adatot a megadott témáról kizárólag nyilvános forrásokból (weboldalak, cikkek, közösségi média). Minden adatot forrással (URL) kell alátámasztanod. Szűrd ki a spekulációkat, csak a tényszerű információkat add át, és készíts belőle egy strukturált összefoglalót. Téma:\n"
+            },
+            {
+                name: "⚙️ Ügyfélszolgálati E-mail Elemző",
+                ai: "https://chatgpt.com",
+                desc: "Beérkező levelek kategorizálása és profi válasz-piszkozatok generálása.",
+                prompt: "Te egy ügyfélszolgálati automatizációs ügynök vagy. A feladatod a következő e-mail elemzése: 1. Kategorizáld (PANASZ, ÉRDEKLŐDÉS, HIBA). 2. Emeld ki az ügyfél nevét. 3. Fogalmazz meg egy udvarias, profi válaszlevelet magyarul a cég nevében, ami megoldást kínál vagy türelmet kér. E-mail szövege:\n"
+            },
+            {
+                name: "📝 Barátságos Levélíró",
+                ai: "https://chatgpt.com",
+                desc: "Segít hivatalos vagy kedves leveleket, emaileket írni.",
+                prompt: "Te egy profi és udvarias asszisztens vagy. Írj egy jól megfogalmazott emailt/levelet a következő témában: "
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function init() {
+            const savedTheme = localStorage.getItem('ai_omni_theme') || 'dark';
+            setTheme(savedTheme);
+
+            if (!localStorage.getItem('ai_contexts_omni_v3')) {
+                localStorage.setItem('ai_contexts_omni_v3', JSON.stringify(defaultContexts));
+            }
+            if (!localStorage.getItem('ai_custom_agents_v3')) {
+                localStorage.setItem('ai_custom_agents_v3', JSON.stringify([]));
+            }
+            renderContexts();
+            renderHints();
+            renderTemplates();
+            renderTools();
+            renderSavedAgentsList();
         }
 
-        agents.forEach((agent) => {
-            let item = document.createElement('div');
-            item.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px;";
-            item.innerHTML = `
-                <span style="font-size: 13px; font-weight: 600; color: var(--accent-purple);">🤖 ${agent.name}</span>
-                <button onclick="deleteAgent('${agent.id}')" style="background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 2px 6px; font-size: 11px;">Törlés</button>
-            `;
-            listContainer.appendChild(item);
-        });
-    }
+        function switchTab(tabId, event) {
+            document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
 
-    function deleteAgent(id) {
-        let agents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
-        agents = agents.filter(a => a.id !== id);
-        localStorage.setItem('ai_custom_agents_v3', JSON.stringify(agents));
-        renderTools();
-        renderSavedAgentsList();
-        showToastMsg('Ügynök törölve.');
-    }
-
-    function filterTools(category) {
-        currentFilter = category;
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        renderTools();
-    }
-
-    function renderContexts() {
-        const select = document.getElementById('context-select');
-        const contexts = JSON.parse(localStorage.getItem('ai_contexts_omni_v3'));
-        select.innerHTML = '';
-        contexts.forEach(ctx => {
-            let option = document.createElement('option');
-            option.value = ctx.text;
-            option.textContent = ctx.name;
-            select.appendChild(option);
-        });
-    }
-
-    function renderHints() {
-        const section = document.getElementById('hint-section');
-        const textarea = document.getElementById('prompt-input');
-        
-        promptHints.forEach(group => {
-            let div = document.createElement('div');
-            div.className = 'hint-group';
-            div.innerHTML = `<div class="hint-title">${group.category}</div>`;
-            
-            group.hints.forEach(hint => {
-                let pill = document.createElement('button');
-                pill.className = `pill ${hint.class}`;
-                pill.textContent = hint.text;
-                pill.setAttribute('data-hint', hint.hint + " (Kattints a beszúráshoz)");
-                
-                pill.onclick = () => {
-                    const textToInsert = hint.text + " ";
-                    const startPos = textarea.selectionStart;
-                    const endPos = textarea.selectionEnd;
-                    textarea.value = textarea.value.substring(0, startPos) + textToInsert + textarea.value.substring(endPos, textarea.value.length);
-                    textarea.focus();
-                    textarea.selectionEnd = startPos + textToInsert.length;
+        function renderTemplates() {
+            const container = document.getElementById('templates-container');
+            container.innerHTML = '';
+            agentTemplates.forEach(t => {
+                let card = document.createElement('div');
+                card.className = 'template-card';
+                card.setAttribute('data-tooltip', 'Kattints az űrlapba való betöltéshez');
+                card.innerHTML = `<div class="template-title">${t.name}</div><div class="template-sub">${t.desc}</div>`;
+                card.onclick = () => {
+                    document.getElementById('agent-name').value = t.name.replace(/[^a-zA-Z0-9öüóőúűáéíÖÜÓŐÚŰÁÉÍ ]/g, '').trim();
+                    document.getElementById('agent-target-ai').value = t.ai;
+                    document.getElementById('agent-prompt').value = t.prompt;
+                    showToastMsg('Sablon betöltve a szerkesztőbe!');
                 };
-                div.appendChild(pill);
+                container.appendChild(card);
             });
-            section.appendChild(div);
-        });
-    }
+        }
 
-    function renderTools() {
-        const grid = document.getElementById('tools-grid');
-        grid.innerHTML = '';
+        function saveAgent() {
+            const name = document.getElementById('agent-name').value.trim();
+            const aiUrl = document.getElementById('agent-target-ai').value;
+            const prompt = document.getElementById('agent-prompt').value.trim();
 
-        let customAgents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
-        let allItems = [];
-        
-        if (currentFilter === 'all' || currentFilter === 'agent') {
-            customAgents.forEach(agent => {
-                allItems.push({
-                    name: agent.name,
-                    icon: '🤖',
-                    category: 'agent',
-                    desc: 'Saját készítésű AI ügynök',
-                    isAgent: true,
-                    agentData: agent,
-                    actions: [{ name: 'Indítás', type: 'agent-run', url: agent.aiUrl, method: 'clipboard', hint: `Elindítja a(z) ${agent.name} ügynököt a system prompttal.` }]
+            if (!name || !prompt) {
+                alert('Kérlek add meg az ügynök nevét és az utasítást!');
+                return;
+            }
+
+            let agents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
+            agents.push({ id: Date.now().toString(), name, aiUrl, prompt });
+            localStorage.setItem('ai_custom_agents_v3', JSON.stringify(agents));
+
+            clearAgentForm();
+            renderTools();
+            renderSavedAgentsList();
+            showToastMsg('Ügynök sikeresen elmentve!');
+        }
+
+        function clearAgentForm() {
+            document.getElementById('agent-name').value = '';
+            document.getElementById('agent-prompt').value = '';
+        }
+
+        function renderSavedAgentsList() {
+            const listContainer = document.getElementById('saved-agents-list');
+            listContainer.innerHTML = '';
+            let agents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
+
+            if (agents.length === 0) {
+                listContainer.innerHTML = '<span style="font-size: 13px; color: var(--text-dim);">Még nincsenek saját ügynökeid. Készíts egyet fent!</span>';
+                return;
+            }
+
+            agents.forEach((agent) => {
+                let item = document.createElement('div');
+                item.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); padding: 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px;";
+                item.innerHTML = `
+                        <span style="font-size: 14px; font-weight: 600; color: var(--accent-purple);">🤖 ${agent.name}</span>
+                        <button class="btn" onclick="deleteAgent('${agent.id}')" style="color: var(--danger); border-color: var(--danger); padding: 4px 8px; font-size: 12px;">Törlés</button>
+                    `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function deleteAgent(id) {
+            if (!confirm('Biztosan törlöd ezt az ügynököt?')) return;
+            let agents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
+            agents = agents.filter(a => a.id !== id);
+            localStorage.setItem('ai_custom_agents_v3', JSON.stringify(agents));
+            renderTools();
+            renderSavedAgentsList();
+            showToastMsg('Ügynök törölve.');
+        }
+
+        function filterTools(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            renderTools();
+        }
+
+        function renderContexts() {
+            const select = document.getElementById('context-select');
+            const contexts = JSON.parse(localStorage.getItem('ai_contexts_omni_v3'));
+            select.innerHTML = '';
+            contexts.forEach(ctx => {
+                let option = document.createElement('option');
+                option.value = ctx.text;
+                option.textContent = ctx.name;
+                select.appendChild(option);
+            });
+        }
+
+        function renderHints() {
+            const section = document.getElementById('hint-section');
+            const textarea = document.getElementById('prompt-input');
+
+            promptHints.forEach(group => {
+                let div = document.createElement('div');
+                div.className = 'hint-group';
+                div.innerHTML = `<div class="hint-title">${group.category}</div>`;
+
+                group.hints.forEach(hint => {
+                    let pill = document.createElement('button');
+                    pill.className = `pill ${hint.class}`;
+                    pill.textContent = hint.text;
+                    pill.setAttribute('data-tooltip', hint.hint);
+
+                    pill.onclick = () => {
+                        const textToInsert = hint.text + " ";
+                        const startPos = textarea.selectionStart;
+                        const endPos = textarea.selectionEnd;
+                        textarea.value = textarea.value.substring(0, startPos) + textToInsert + textarea.value.substring(endPos, textarea.value.length);
+                        textarea.focus();
+                        textarea.selectionEnd = startPos + textToInsert.length;
+                    };
+                    div.appendChild(pill);
                 });
+                section.appendChild(div);
             });
         }
 
-        if (currentFilter !== 'agent') {
-            allTools.forEach(tool => {
-                if (currentFilter === 'all' || tool.category === currentFilter) {
-                    allItems.push(tool);
-                }
-            });
-        }
+        function renderTools() {
+            const grid = document.getElementById('tools-grid');
+            grid.innerHTML = '';
 
-        allItems.forEach(tool => {
-            let card = document.createElement('div');
-            card.className = 'tool-card';
-            if (tool.isAgent) card.style.borderColor = 'var(--accent-purple)';
+            let customAgents = JSON.parse(localStorage.getItem('ai_custom_agents_v3'));
+            let allItems = [];
 
-            let html = `
-                <div class="tool-header" data-hint="${tool.desc}">
-                    <span class="tool-icon">${tool.icon}</span>
-                    <h3 class="tool-title">${tool.name}</h3>
-                </div>
-                <div class="action-group">
-            `;
-            card.innerHTML = html;
-            let actionGroup = card.querySelector('.action-group');
+            if (currentFilter === 'all' || currentFilter === 'agent') {
+                customAgents.forEach(agent => {
+                    allItems.push({
+                        name: agent.name,
+                        icon: '🤖',
+                        category: 'agent',
+                        desc: 'A te saját készítésű segéded',
+                        isAgent: true,
+                        agentData: agent,
+                        actions: [{ name: 'Indítás', type: 'agent-run', url: agent.aiUrl, method: 'clipboard', hint: `Megnyitja a rendszert és másolja az utasításokat.` }]
+                    });
+                });
+            }
 
-            tool.actions.forEach(action => {
-                let btn = document.createElement('button');
-                btn.className = `action-btn ${action.type}`;
-                btn.setAttribute('data-hint', action.hint);
-                
-                let icon = tool.isAgent ? '🤖 ' : (action.type === 'guest' ? '⚡ ' : (action.type === 'software' ? '⬇️ ' : '🔒 '));
-                btn.innerHTML = `<span>${icon}${action.name}</span> <span>→</span>`;
-                
-                btn.onclick = () => {
-                    if (tool.isAgent) {
-                        launchAgent(tool.agentData);
-                    } else {
-                        launchTool(action);
+            if (currentFilter !== 'agent') {
+                allTools.forEach(tool => {
+                    if (currentFilter === 'all' || tool.category === currentFilter) {
+                        allItems.push(tool);
                     }
-                };
-                actionGroup.appendChild(btn);
+                });
+            }
+
+            allItems.forEach(tool => {
+                let card = document.createElement('div');
+                card.className = 'tool-card';
+                if (tool.isAgent) card.style.borderColor = 'var(--accent-purple)';
+
+                let html = `
+                        <div class="tool-header" data-tooltip="${tool.desc}">
+                            <span class="tool-icon">${tool.icon}</span>
+                            <h3 class="tool-title">${tool.name}</h3>
+                        </div>
+                        <div class="action-group">
+                    `;
+                card.innerHTML = html;
+                let actionGroup = card.querySelector('.action-group');
+
+                tool.actions.forEach(action => {
+                    let btn = document.createElement('button');
+                    btn.className = `action-btn ${action.type}`;
+                    btn.setAttribute('data-tooltip', action.hint);
+
+                    let icon = tool.isAgent ? '🤖 ' : (action.type === 'guest' ? '⚡ ' : '🔒 ');
+                    btn.innerHTML = `<span>${icon}${action.name}</span> <span>→</span>`;
+
+                    btn.onclick = () => {
+                        if (tool.isAgent) {
+                            launchAgent(tool.agentData);
+                        } else {
+                            launchTool(action);
+                        }
+                    };
+                    actionGroup.appendChild(btn);
+                });
+                grid.appendChild(card);
             });
-            grid.appendChild(card);
-        });
-    }
-
-    function launchAgent(agent) {
-        const userPrompt = document.getElementById('prompt-input').value;
-        const fullMessage = `${agent.prompt}\n\nFeladat / Bemenet: ${userPrompt}`;
-
-        navigator.clipboard.writeText(fullMessage).then(() => {
-            showToastMsg(`🤖 ${agent.name} aktiválva! Adatok a vágólapon.`);
-            setTimeout(() => window.open(agent.aiUrl, '_blank'), 1000);
-        });
-    }
-
-    function launchTool(action) {
-        const contextText = document.getElementById('context-select').value;
-        const promptText = document.getElementById('prompt-input').value;
-        let fullMessage = contextText ? `${contextText}\n\n${promptText}` : promptText;
-
-        if (!fullMessage.trim()) {
-            window.open(action.url, '_blank');
-            return;
         }
 
-        if (action.method === 'url') {
-            window.open(action.url + encodeURIComponent(fullMessage), '_blank');
-        } else {
+        function launchAgent(agent) {
+            const userPrompt = document.getElementById('prompt-input').value;
+            const fullMessage = `${agent.prompt}\n\nEzt kell csinálnod: ${userPrompt}`;
+
             navigator.clipboard.writeText(fullMessage).then(() => {
-                showToastMsg('✅ Vágólapra másolva! Nyomj Ctrl+V-t.');
-                setTimeout(() => window.open(action.url, '_blank'), 1000);
+                showToastMsg(`🤖 Másolva! A felugró ablakban nyomj Ctrl+V-t.`);
+                setTimeout(() => window.open(agent.aiUrl, '_blank'), 1000);
             });
         }
-    }
 
-    function manageContexts() {
-        let contexts = JSON.parse(localStorage.getItem('ai_contexts_omni_v3'));
-        let names = contexts.map((c, index) => `[${index}] ${c.name}`).join('\n');
-        let choice = prompt(`Szerkesztés:\nÍrd be az 'ÚJ' szót, vagy egy SZÁMOT a törléshez:\n\n${names}`);
-        if (choice === null) return;
-        if (choice.toUpperCase() === 'ÚJ') {
-            let newName = prompt("Név:");
-            if (!newName) return;
-            let newText = prompt("Utasítás szövege:");
-            contexts.push({ id: Date.now().toString(), name: newName, text: newText });
-        } else if (!isNaN(choice) && contexts[parseInt(choice)]) {
-            if(confirm(`Törlöd?`)) contexts.splice(parseInt(choice), 1);
+        function launchTool(action) {
+            const contextText = document.getElementById('context-select').value;
+            const promptText = document.getElementById('prompt-input').value;
+            let fullMessage = contextText ? `${contextText}\n\n${promptText}` : promptText;
+
+            if (!fullMessage.trim()) {
+                window.open(action.url, '_blank');
+                return;
+            }
+
+            if (action.method === 'url') {
+                window.open(action.url + encodeURIComponent(fullMessage), '_blank');
+            } else {
+                navigator.clipboard.writeText(fullMessage).then(() => {
+                    showToastMsg('✅ Szöveg másolva! A felugró ablakban nyomj Ctrl+V-t.');
+                    setTimeout(() => window.open(action.url, '_blank'), 1000);
+                });
+            }
         }
-        localStorage.setItem('ai_contexts_omni_v3', JSON.stringify(contexts));
-        renderContexts();
-    }
 
-    function showToastMsg(msg) {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 3000);
-    }
+        function manageContexts() {
+            let contexts = JSON.parse(localStorage.getItem('ai_contexts_omni_v3'));
+            let names = contexts.map((c, index) => `[${index}] ${c.name}`).join('\n');
+            let choice = prompt(`Szerkesztés:\nÍrd be az 'ÚJ' szót az újhoz, vagy egy SZÁMOT a törléshez:\n\n${names}`);
+            if (choice === null) return;
+            if (choice.toUpperCase() === 'ÚJ') {
+                let newName = prompt("Mi legyen a szerepkör neve? (Pl. Fordító)");
+                if (!newName) return;
+                let newText = prompt("Mit csináljon? (Pl. Fordítsd le a szöveget magyarra!)");
+                contexts.push({ id: Date.now().toString(), name: newName, text: newText });
+            } else if (!isNaN(choice) && contexts[parseInt(choice)]) {
+                if (confirm(`Biztosan törlöd?`)) contexts.splice(parseInt(choice), 1);
+            }
+            localStorage.setItem('ai_contexts_omni_v3', JSON.stringify(contexts));
+            renderContexts();
+        }
 
-    init();
-</script>
+        function showToastMsg(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 4000);
+        }
+
+        init();
+    </script>
 
 </body>
 </html>
