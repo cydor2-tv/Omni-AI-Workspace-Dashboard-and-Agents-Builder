@@ -1,8 +1,5 @@
-# Minden fájl figyelmen kívül hagyása a mappában alapból
-*
+# Visual Studio belső mappa kizárása
+.vs/
 
-# Kivételek: ezeket felengedjük a GitHubra
-!index.html
-!.gitignore
-!README.md
-!LICENSE
+# Minden Windows internetes hivatkozás (.url fájl) kizárása
+*.url
