@@ -1,0 +1,8 @@
+# Minden fájl figyelmen kívül hagyása a mappában alapból
+*
+
+# Kivételek: ezeket felengedjük a GitHubra
+!index.html
+!.gitignore
+!README.md
+!LICENSE
