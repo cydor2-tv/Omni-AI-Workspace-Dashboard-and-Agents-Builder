@@ -67,7 +67,7 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* --- JAVÍTOTT, GLOBÁLIS TOOLTIP (JS-alapú lesz) --- */
+        /* --- GLOBÁLIS TOOLTIP (JS-alapú) --- */
         [data-tooltip] {
             cursor: help;
         }
@@ -83,7 +83,7 @@
             border-radius: 6px;
             max-width: 280px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            z-index: 999999; /* Mindig a legfelül */
+            z-index: 999999;
             pointer-events: none;
             display: none;
             border: 1px solid var(--border);
@@ -533,7 +533,7 @@
 </head>
 <body>
 
-    <!-- Globális felugró tipp (Ezzel megoldva a levágódó CSS hiba) -->
+    <!-- Globális felugró tipp (Levágás elleni védelem) -->
     <div id="global-tooltip"></div>
 
     <!-- Fejléc (Fülek és Témaváltó) -->
@@ -574,6 +574,8 @@
                 <button class="filter-btn" onclick="filterTools('text')">💬 Szöveg & Chat</button>
                 <button class="filter-btn" onclick="filterTools('image')">🎨 Kép</button>
                 <button class="filter-btn" onclick="filterTools('video')">🎥 Videó</button>
+                <!-- ZENE GOMB VISSZATÉRT -->
+                <button class="filter-btn" onclick="filterTools('audio')">🎵 Hang & Zene</button>
                 <button class="filter-btn" onclick="filterTools('code')">💻 Kód & Automatizáció</button>
                 <button class="filter-btn" onclick="filterTools('agent')" style="color: var(--accent-purple); border-color: var(--accent-purple);">🤖 Saját Ügynökeim</button>
             </div>
@@ -621,7 +623,7 @@
     <div id="toast">✅ Szöveg másolva! Nyomj Ctrl+V (vagy Hosszan érintés -> Beillesztés) a megnyíló ablakban.</div>
 
     <script>
-        // --- GLOBÁLIS TOOLTIP LOGIKA (Levágás elleni védelem) ---
+        // --- GLOBÁLIS TOOLTIP LOGIKA ---
         const tooltipEl = document.getElementById('global-tooltip');
 
         document.addEventListener('mouseover', (e) => {
@@ -638,7 +640,6 @@
                 let y = e.clientY + 15;
                 const rect = tooltipEl.getBoundingClientRect();
 
-                // Képernyő szélének ellenőrzése
                 if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
                 if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
 
@@ -660,7 +661,7 @@
             localStorage.setItem('ai_omni_theme', theme);
         }
 
-        // --- Bővített Prompt Hint Adatbázis ---
+        // --- HINTS / GYORS GOMBOK ---
         const promptHints = [
             {
                 category: "Szöveg és Stílus",
@@ -681,6 +682,14 @@
                 ]
             },
             {
+                category: "Zene Generálás",
+                hints: [
+                    { text: "[Verse 1]", class: "img-tag", hint: "Versszak kezdete." },
+                    { text: "[Chorus]", class: "img-tag", hint: "Refrén / Kiemelt rész." },
+                    { text: "upbeat synthwave", class: "img-tag", hint: "Gyors, elektronikus stílus." }
+                ]
+            },
+            {
                 category: "Munka és Kód",
                 hints: [
                     { text: "Csak a kódot add vissza", class: "", hint: "Nincs felesleges magyarázat." },
@@ -696,30 +705,37 @@
             { id: '3', name: 'Helyesírás Ellenőr', text: 'Kérlek javítsd ki az alábbi szöveg helyesírását, tagold profin és tedd olvashatóvá: ' }
         ];
 
-        // --- ESZKÖZTÁR (Kiemelve a DeepSeek-et!) ---
+        // --- TELJES ESZKÖZTÁR (Kibővítve) ---
         const allTools = [
+            // Általános / Chat
             { name: 'ChatGPT', icon: '🤖', category: 'text', desc: 'A legismertebb AI asszisztens bármilyen feladatra.', actions: [{ name: 'Névtelen (Gyors)', type: 'guest', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Belépés nélkül' }, { name: 'Fiókba lépve', type: 'login', url: 'https://chatgpt.com', method: 'clipboard', hint: 'Előzmények mentése' }] },
             { name: 'Claude', icon: '✍️', category: 'text', desc: 'Nagyon okos, szuperül ír és programozik.', actions: [{ name: 'Új Beszélgetés', type: 'login', url: 'https://claude.ai/new', method: 'clipboard', hint: 'Claude megnyitása' }] },
-
-            /* --- DEEPSEEK KIEMELÉSE --- */
             { name: 'DeepSeek', icon: '🐳', category: 'text', desc: 'Kiváló matematikai logikához és kódoláshoz.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://chat.deepseek.com/', method: 'clipboard', hint: 'DeepSeek Chat indul!' }] },
-            { name: 'DeepSeek Coder', icon: '💻', category: 'code', desc: 'Programozói feladatokra fókuszált nyílt rendszer.', actions: [{ name: 'Kódolás Indítása', type: 'login', url: 'https://chat.deepseek.com/', method: 'clipboard', hint: 'Kódolási feladatokhoz ajánlott' }] },
-            /* --------------------------- */
-
             { name: 'Google Gemini', icon: '🌌', category: 'text', desc: 'A Google AI-ja hatalmas memóriával.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://gemini.google.com/app', method: 'clipboard', hint: 'Gemini nyitása' }] },
             { name: 'Perplexity', icon: '🔍', category: 'text', desc: 'Keres az interneten és forrásokat (linkeket) ad.', actions: [{ name: 'Gyors Keresés', type: 'guest', url: 'https://www.perplexity.ai/?q=', method: 'url', hint: 'Azonnali netes kutatás' }] },
             { name: 'HuggingFace Chat', icon: '🤗', category: 'text', desc: 'Ingyenes, nyílt forráskódú modellek.', actions: [{ name: 'Megnyitás (Vendég)', type: 'guest', url: 'https://huggingface.co/chat/', method: 'clipboard', hint: 'Regisztráció nélkül is megy' }] },
 
-            { name: 'Cursor AI', icon: '⌨️', category: 'code', desc: 'A legjobb AI kódszerkesztő (Letölthető).', actions: [{ name: 'Weboldal', type: 'software', url: 'https://www.cursor.com/', method: 'url', hint: 'Letöltés' }] },
+            // Szerepjáték (Visszatért!)
+            { name: 'Character.AI', icon: '💬', category: 'text', desc: 'Chatelj hírességekkel és fiktív karakterekkel.', actions: [{ name: 'Főoldal', type: 'guest', url: 'https://character.ai/', method: 'clipboard', hint: 'C.AI megnyitása' }] },
+            { name: 'JanitorAI', icon: '🎭', category: 'text', desc: 'Szűretlen, kötetlen közösségi szerepjáték AI.', actions: [{ name: 'Karakterek', type: 'login', url: 'https://janitorai.com/', method: 'clipboard', hint: 'Közösségi AI karakterek' }] },
+
+            // Fejlesztés & Kód (Phind visszatért)
+            { name: 'DeepSeek Coder', icon: '💻', category: 'code', desc: 'Programozói feladatokra fókuszált nyílt rendszer.', actions: [{ name: 'Kódolás Indítása', type: 'login', url: 'https://chat.deepseek.com/', method: 'clipboard', hint: 'Kódolási feladatokhoz ajánlott' }] },
+            { name: 'Cursor AI', icon: '⌨️', category: 'code', desc: 'A legjobb AI kódszerkesztő kliens (Letölthető).', actions: [{ name: 'Weboldal', type: 'software', url: 'https://www.cursor.com/', method: 'url', hint: 'Letöltés' }] },
+            { name: 'Phind', icon: '💻', category: 'code', desc: 'Kifejezetten programozóknak fejlesztett kereső.', actions: [{ name: 'Gyors Keresés', type: 'guest', url: 'https://www.phind.com/search?q=', method: 'url', hint: 'Kódolási segítség' }] },
             { name: 'Zapier / n8n', icon: '⚙️', category: 'code', desc: 'Rendszerek összekötése (No-code).', actions: [{ name: 'Zapier', type: 'software', url: 'https://zapier.com/', method: 'url', hint: 'Felhős automatizáció' }, { name: 'n8n', type: 'software', url: 'https://n8n.io/', method: 'url', hint: 'Saját szerveres (Self-hosted)' }] },
 
+            // Kép & Videó
             { name: 'Midjourney', icon: '🎨', category: 'image', desc: 'Professzionális, fotórealisztikus képgenerátor.', actions: [{ name: 'Webes Felület', type: 'login', url: 'https://www.midjourney.com/imagine', method: 'clipboard', hint: 'Képkészítő megnyitása' }] },
-            { name: 'Bing Képkészítő', icon: '🖼️', category: 'image', desc: 'Ingyenes DALL-E 3 generátor.', actions: [{ name: 'Generálás', type: 'login', url: 'https://www.bing.com/images/create?q=', method: 'url', hint: 'Azonnali generálás' }] },
-            { name: 'Runway (Gen-3)', icon: '🎬', category: 'video', desc: 'Videó generálás szövegből/képből.', actions: [{ name: 'Videós Stúdió', type: 'login', url: 'https://app.runwayml.com/', method: 'clipboard', hint: 'Film készítése' }] },
-            { name: 'Suno AI', icon: '🎸', category: 'audio', desc: 'Kész zeneszámokat ír (énekkel együtt).', actions: [{ name: 'Zene Készítése', type: 'login', url: 'https://suno.com/create', method: 'clipboard', hint: 'Zene generálása' }] }
+            { name: 'Bing Képkészítő', icon: '🖼️', category: 'image', desc: 'Ingyenes DALL-E 3 képgenerátor.', actions: [{ name: 'Generálás', type: 'login', url: 'https://www.bing.com/images/create?q=', method: 'url', hint: 'Azonnali generálás' }] },
+            { name: 'Runway (Gen-3)', icon: '🎬', category: 'video', desc: 'Videó generálás szövegből vagy képből.', actions: [{ name: 'Videós Stúdió', type: 'login', url: 'https://app.runwayml.com/', method: 'clipboard', hint: 'Film készítése' }] },
+
+            // Hang & Zene (Bővítve)
+            { name: 'Suno AI', icon: '🎸', category: 'audio', desc: 'Kész zeneszámokat ír (énekkel együtt).', actions: [{ name: 'Zene Készítése', type: 'login', url: 'https://suno.com/create', method: 'clipboard', hint: 'Suno megnyitása' }] },
+            { name: 'Udio AI', icon: '🎧', category: 'audio', desc: 'Kiváló minőségű zene és ének generálás.', actions: [{ name: 'Megnyitás', type: 'login', url: 'https://www.udio.com/', method: 'clipboard', hint: 'Udio megnyitása' }] }
         ];
 
-        // --- BŐVÍTETT HÉTKÖZNAPI ÉS KOMBINÁLHATÓ ÜGYNÖK SABLONOK ---
+        // --- ÜGYNÖK SABLONOK ---
         const agentTemplates = [
             // Hétköznapi Élet
             { id: 't1', name: '🍲 Recept Mester', ai: 'https://chatgpt.com', desc: 'Megmondod mi van a hűtőben, ő receptet ír.', prompt: 'Te egy profi szakács vagy. A megadott alapanyagokból találj ki egy egyszerűen elkészíthető receptet, add meg a pontos lépéseket, és tippeld meg a főzési időt!' },
@@ -729,9 +745,13 @@
             { id: 't5', name: '📧 E-mail Asszisztens', ai: 'https://chatgpt.com', desc: 'Hivatalos és professzionális levélíró.', prompt: 'Te egy udvarias céges asszisztens vagy. Fogalmazz meg egy professzionális, hivatalos e-mailt a megadott témában, ügyelve a tiszteletteljes hangnemre.' },
 
             // Szórakozás és Stílus ("Lego" kiegészítők)
-            { id: 't6', name: '😈 Szarkasztikus Haver', ai: 'https://chatgpt.com', desc: '[STÍLUS KIEGÉSZÍTŐ] Humorosan beszólogatós.', prompt: 'Fontos szabály: Minden válaszodat egy cinikus, szarkasztikus megjegyzéssel vagy poénnal kezdd, mintha nagyon unodna a kérdést. Utána viszont add meg a pontos, tökéletes választ.' },
-            { id: 't7', name: '🧸 5 Éves Vagyok', ai: 'https://gemini.google.com/app', desc: '[STÍLUS KIEGÉSZÍTŐ] Végtelenül lebutított analógiák.', prompt: 'Fontos szabály: Kérlek mindent úgy magyarázz el, mintha 5 éves lennék. Kerüld a szakzsargont, használj hétköznapi hasonlatokat (pl. lego, játszótér, csoki)!' },
+            { id: 't6', name: '😈 Szarkasztikus Haver', ai: 'https://chatgpt.com', desc: '[STÍLUS] Humorosan beszólogatós.', prompt: 'Fontos szabály: Minden válaszodat egy cinikus, szarkasztikus megjegyzéssel vagy poénnal kezdd, mintha nagyon unodna a kérdést. Utána viszont add meg a pontos, tökéletes választ.' },
+            { id: 't7', name: '🧸 5 Éves Vagyok', ai: 'https://gemini.google.com/app', desc: '[STÍLUS] Végtelenül lebutított analógiák.', prompt: 'Fontos szabály: Kérlek mindent úgy magyarázz el, mintha 5 éves lennék. Kerüld a szakzsargont, használj hétköznapi hasonlatokat (pl. lego, játszótér, csoki)!' },
             { id: 't8', name: '🇬🇧 Nyelvtanár (Angol)', ai: 'https://chatgpt.com', desc: 'Javít és magyarázza a nyelvtant.', prompt: 'Te egy angol nyelvtanár vagy. A feladatod nemcsak a szöveg lefordítása, hanem az esetleges hibáim kijavítása, és a használt nyelvtani szabályok (pl. igeidők) röviden történő elmagyarázása.' },
+
+            // Kreatív (Zene & Kép)
+            { id: 't11', name: '🎸 Zeneszerző & Szövegíró', ai: 'https://chatgpt.com', desc: 'Suno/Udio AI-hoz ír dalszöveget és angol stílus-címkéket.', prompt: 'Te egy profi dalszövegíró és zenei producer vagy. Írj egy kreatív dalszöveget a megadott témában, [Verse] és [Chorus] részekkel. A végén adj meg 5-6 angol zenei stílus-címkét (pl. upbeat synthwave, female vocals), amit a Suno/Udio AI-ba másolhatok!' },
+            { id: 't12', name: '🎨 Képgeneráló Mester', ai: 'https://claude.ai/new', desc: 'Midjourney/Bing képekhez ír tökéletes angol promptot.', prompt: 'Te egy profi AI képgeneráló prompt-mérnök vagy. A megadott magyar ötletből írj egy rendkívül részletes, angol nyelvű promptot (fények, kamera, stílus, hangulat megadásával), ami Midjourney-ben tökéletesen fog kinézni!' },
 
             // Professzionális / IT
             { id: 't9', name: '💻 Senior Szoftverarchitekt', ai: 'https://chat.deepseek.com/', desc: 'Kód írása Clean Code elvekkel (DeepSeek).', prompt: 'Te egy Senior Szoftverfejlesztő vagy. Elemezd a megadott kódot/feladatot, és írj moduláris, "Clean Code" szabályokat követő megoldást. Indokold meg a döntéseidet, és mielőtt kódolsz, írj egy rövid tervezetet!' },
@@ -761,7 +781,7 @@
             event.currentTarget.classList.add('active');
         }
 
-        // --- ÚJ: LEGO SABLON RENDSZER ---
+        // --- LEGO SABLON RENDSZER ---
         function renderTemplates() {
             const container = document.getElementById('templates-container');
             container.innerHTML = '';
@@ -800,7 +820,6 @@
                 document.getElementById('agent-prompt').value = currentPrompt ? (currentPrompt + '\n\n' + t.prompt) : t.prompt;
                 document.getElementById('agent-name').value = currentName ? (currentName + ' + ' + newNamePart) : newNamePart;
 
-                // Ai forrás frissítése, csak ha az előző üres volt
                 if (!currentPrompt) document.getElementById('agent-target-ai').value = t.ai;
 
                 showToastMsg('Sablon ráfűzve (Lego)!');
